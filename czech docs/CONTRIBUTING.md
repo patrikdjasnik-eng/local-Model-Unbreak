@@ -73,6 +73,22 @@ Změny ovlivňující trust boundaries, plan scoring semantics, persisted format
 
 Neotvírej public issue pro vulnerability, která může umožnit remote code execution, unauthorized node use, credential exposure nebo prompt/model exfiltration. Postupuj podle [SECURITY.md](SECURITY.md).
 
+
+## Security a product-documentation changes
+
+Změny model sources, artifact acquisition, cloning, Creeping Frost policy, SafeCell boundaries, remote-node trust nebo security events musí ve stejném PR aktualizovat odpovídající specification.
+
+Catalog změna obsahuje:
+
+- exact upstream repo ID,
+- exact filename/quantization,
+- license state,
+- source verification evidence,
+- zda je entry Free nebo Premium-curated,
+- zda Model Unbreak skutečně verified runtime behavior, nebo pouze upstream source.
+
+Security Lab změna obsahuje failure-path test a update threat modelu, pokud se mění trust boundary.
+
 ## Pull request checklist
 
 - [ ] Změna má jeden jasný účel.
