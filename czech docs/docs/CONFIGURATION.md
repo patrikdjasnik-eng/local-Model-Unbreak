@@ -80,6 +80,58 @@ Configuration validation má reportovat:
 - zda je problém fatal,
 - safe remediation, pokud je možná.
 
+
+## Catalog a acquisition konfigurace
+
+Plánovaný config surface:
+
+```yaml
+catalog:
+  channel: stable
+  allowUserProvidedGguf: true
+
+acquisition:
+  provider: huggingface
+  requireConsent: true
+  partialDownloads: true
+  quarantine: true
+  verifySha256: true
+  diskSafetyReserveMiB: 2048
+```
+
+Repository credentials pro gated/private artifacts patří do secret storage, ne do tohoto souboru.
+
+## Security Lab konfigurace
+
+```yaml
+security:
+  mode: hardened
+  creepingFrost:
+    defaultDecision: ask
+    adaptiveTightening: true
+  safeCell:
+    requiredForUnknownArtifacts: true
+  network:
+    inferenceEgress: deny
+  deception:
+    enabled: false
+  evidence:
+    localOnly: true
+```
+
+Security settings lze vyšší-precedence policy zpřísnit. Lower-precedence project config nesmí tiše oslabit user/admin security policy.
+
+## Clone konfigurace
+
+```yaml
+clone:
+  defaultDataSource: synthetic-only
+  requireDataPreview: true
+  allowRemoteTraining: false
+```
+
+Personal data sources vyžadují per-job consent i když je cloning globálně enabled.
+
 ## Stav
 
 Configuration format je záměrně nezmrazený před prvními planner a backend adapter prototypy. Budoucí stable schema vyžaduje decision record v [DECISIONS.md](DECISIONS.md).
