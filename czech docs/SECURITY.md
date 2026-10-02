@@ -60,6 +60,32 @@ První verze neposkytují security promise pro:
 - multi-tenant isolation na úrovni hardened cloud providera,
 - ochranu proti fully compromised operating system nebo GPU driveru.
 
+
+## Security Lab architektura
+
+Projektová security architektura je v [docs/security/README.md](docs/security/README.md).
+
+Core controls:
+
+- **Creeping Frost AI Firewall v2** — capability-aware `ALLOW / ASK / DENY` policy a restrictions.
+- **SafeCell** — disposable runtime/filesystem/network containment.
+- **HoneyNet + Deception Mode** — synthetic canaries a decoy services bez real credentials.
+- **Threat Hunting** — baseline-aware behavioral monitoring a correlation.
+- **Supply Chain Guard** — exact artifact source, revision, licence, hashes, quarantine a promotion.
+- **Node Attestation** — remote-worker identity a drift evidence.
+- **Defense Validation** — non-destructive validation pouze na owned nebo explicitně authorized systems.
+- **Incident Response** — containment, evidence preservation, trust changes a recovery.
+
+Základní security protection nemá být paywall. Premium může přidat history, policy automation, remote orchestration a richer reporting, ale baseline quarantine/isolation/integrity controls zůstávají safety součástí produktu.
+
+## Security model acquisition
+
+Instalace modelu respektuje [docs/MODEL_ACQUISITION.md](docs/MODEL_ACQUISITION.md). Downloaded file jde do staging/quarantine před promotion do trusted local model store. Runtime update prochází stejnou supply-chain policy.
+
+## Security Model Clone
+
+Clone workflow respektuje [docs/MODEL_CLONING.md](docs/MODEL_CLONING.md). User conversations, folders, coding sessions ani datasets se nikdy tiše nepřidávají do trainingu. Remote training vyžaduje explicit approval a trusted/attested node.
+
 ## Disclosure
 
 Po opravě vulnerability může projekt zveřejnit stručné advisory s affected versions, severity, mitigation a upgrade guidance bez unnecessary exploit detailů.
