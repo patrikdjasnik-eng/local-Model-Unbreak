@@ -120,3 +120,35 @@ Aktualizuj tento dokument před merge feature, která přidá:
 - změny credential storage,
 - automatic execution downloaded artifacts,
 - nové network-facing endpoints.
+
+## Rozšířené threats
+
+### Model/runtime supply chain
+
+Threats: artifact substitution, mutable upstream refs, malformed GGUF metadata, compromised runtime binary, license-state confusion a incomplete download promoted jako valid artifact.
+
+Mitigace: exact artifact records, revision pinning pro catalog release, local hashing, quarantine, bounded parsing, SafeCell smoke test a Creeping Frost promotion policy.
+
+### Clone-data exposure
+
+Threats: accidental inclusion secrets, širší folder scope než intended, silent conversation reuse nebo remote training na untrusted nodu.
+
+Mitigace: synthetic-only default, explicit data-source scope, preview/scrubbing, local-first training, attested nodes a visible transfer consent.
+
+### Deception misuse
+
+Threat: real credentials nebo production systems omylem použité jako decoys.
+
+Mitigace: pouze synthetic non-privileged canaries; žádná retaliation ani external targeting.
+
+### Policy bypass
+
+Threat: component spustí runtime/network operation bez Creeping Frost evaluation.
+
+Mitigace: central capability contract, integration tests, fail-closed enforcement a event auditing.
+
+### Attestation drift
+
+Threat: previously trusted node změní worker/runtime/security state.
+
+Mitigace: attestation snapshots, hash/version comparison, automatic trust downgrade na `OBSERVED` a fresh approval podle policy.
