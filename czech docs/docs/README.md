@@ -52,6 +52,7 @@ Repository-level projektové dokumenty jsou o úroveň výše:
 - [security/INCIDENT_RESPONSE.md](security/INCIDENT_RESPONSE.md) — containment a recovery.
 - [security/SECURITY_EVENTS.md](security/SECURITY_EVENTS.md) — normalized security event contract.
 - [PRIVATE_MODULE_BOUNDARY.md](PRIVATE_MODULE_BOUNDARY.md) — hranice public/private extensions a pravidla migrace.
+- [CONSOLIDATION.md](CONSOLIDATION.md) — mapa migrace existujících runtime/security projektů do sjednoceného core.
 
 ## Role dokumentů
 
