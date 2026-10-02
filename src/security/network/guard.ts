@@ -28,6 +28,11 @@ const defaultResolver: DnsResolver = async (hostname) => {
   }));
 };
 
+function normalizeHostname(hostname: string): string {
+  const value = hostname.toLowerCase();
+  return value.startsWith("[") && value.endsWith("]") ? value.slice(1, -1) : value;
+}
+
 function ipv4ToInt(value: string): number {
   return value.split(".").reduce((acc, part) => ((acc << 8) | Number(part)) >>> 0, 0);
 }
@@ -39,9 +44,11 @@ function inV4Range(value: number, base: string, prefix: number): boolean {
 }
 
 export function isGlobalIp(address: string): boolean {
-  const family = isIP(address);
+  const normalizedAddress = normalizeHostname(address);
+  const family = isIP(normalizedAddress);
+
   if (family === 4) {
-    const value = ipv4ToInt(address);
+    const value = ipv4ToInt(normalizedAddress);
     const blocked: Array<[string, number]> = [
       ["0.0.0.0", 8],
       ["10.0.0.0", 8],
@@ -62,14 +69,14 @@ export function isGlobalIp(address: string): boolean {
   }
 
   if (family === 6) {
-    const normalized = address.toLowerCase();
-    if (normalized === "::" || normalized === "::1") return false;
-    if (normalized.startsWith("fc") || normalized.startsWith("fd")) return false;
-    if (/^fe[89ab]/.test(normalized)) return false;
-    if (normalized.startsWith("ff")) return false;
-    if (normalized.startsWith("2001:db8:") || normalized === "2001:db8::") return false;
-    if (normalized.startsWith("::ffff:")) {
-      const mapped = normalized.slice("::ffff:".length);
+    const value = normalizedAddress.toLowerCase();
+    if (value === "::" || value === "::1") return false;
+    if (value.startsWith("fc") || value.startsWith("fd")) return false;
+    if (/^fe[89ab]/.test(value)) return false;
+    if (value.startsWith("ff")) return false;
+    if (value.startsWith("2001:db8:") || value === "2001:db8::") return false;
+    if (value.startsWith("::ffff:")) {
+      const mapped = value.slice("::ffff:".length);
       return isIP(mapped) === 4 && isGlobalIp(mapped);
     }
     return true;
@@ -79,9 +86,10 @@ export function isGlobalIp(address: string): boolean {
 }
 
 function isLoopbackIp(address: string): boolean {
-  if (address === "::1") return true;
-  if (isIP(address) !== 4) return false;
-  return inV4Range(ipv4ToInt(address), "127.0.0.0", 8);
+  const normalizedAddress = normalizeHostname(address);
+  if (normalizedAddress === "::1") return true;
+  if (isIP(normalizedAddress) !== 4) return false;
+  return inV4Range(ipv4ToInt(normalizedAddress), "127.0.0.0", 8);
 }
 
 export async function validateHttpTarget(
@@ -89,8 +97,9 @@ export async function validateHttpTarget(
   options: NetworkGuardOptions = {}
 ): Promise<ValidatedHttpTarget> {
   const value = rawUrl.trim();
-  const url = new URL(value);
+  if (!value) throw new Error("URL is required.");
 
+  const url = new URL(value);
   if (!["http:", "https:"].includes(url.protocol)) {
     throw new Error("Only HTTP(S) URLs are allowed.");
   }
@@ -98,11 +107,12 @@ export async function validateHttpTarget(
     throw new Error("Credentials in URLs are not allowed.");
   }
 
-  const hostname = url.hostname.toLowerCase();
+  const hostname = normalizeHostname(url.hostname);
   const explicitLoopback = hostname === "localhost" || isLoopbackIp(hostname);
   const resolver = options.resolver ?? defaultResolver;
-  const addresses = isIP(hostname)
-    ? [{ address: hostname, family: isIP(hostname) as 4 | 6 }]
+  const literalFamily = isIP(hostname);
+  const addresses: readonly ResolvedAddress[] = literalFamily
+    ? [{ address: hostname, family: literalFamily as 4 | 6 }]
     : await resolver(hostname);
 
   if (addresses.length === 0) throw new Error("DNS resolution returned no addresses.");

@@ -8,13 +8,15 @@ export class InMemorySecurityEventStore implements SecurityEventStore {
 
   append(event: SecurityEvent): void {
     if (this.byId.has(event.id)) throw new Error(`Security event already exists: ${event.id}`);
-    const frozen = Object.freeze({
+
+    const frozen: SecurityEvent = Object.freeze({
       ...event,
       source: Object.freeze({ ...event.source }),
-      resource: event.resource ? Object.freeze({ ...event.resource }) : undefined,
-      policy: event.policy ? Object.freeze({ ...event.policy }) : undefined,
+      ...(event.resource ? { resource: Object.freeze({ ...event.resource }) } : {}),
+      ...(event.policy ? { policy: Object.freeze({ ...event.policy }) } : {}),
       evidenceRefs: Object.freeze([...event.evidenceRefs])
     });
+
     this.events.push(frozen);
     this.byId.set(frozen.id, frozen);
   }
