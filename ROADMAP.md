@@ -8,7 +8,7 @@ The roadmap is milestone-based. Dates are intentionally omitted until the first 
 
 ## Current focus
 
-Define a trustworthy planning model before building automatic remote execution.
+Implement and validate M1 local hardware/GGUF inspection and the first explainable local fit plan before building automatic remote execution.
 
 ## Milestones
 
@@ -32,6 +32,8 @@ Exit criterion: contributors can implement components without guessing what the 
 - [ ] Add unit tests for unsupported and partial hardware
 
 Exit criterion: `model-unbreak inspect model.gguf` explains what the model needs and what the machine provides.
+
+**Implementation note:** M1 code exists on `feature/m1-local-inspector`; checklist items remain open until typecheck, tests, build, and CI validation are green.
 
 ### M2 — Reproducible local benchmark engine
 
