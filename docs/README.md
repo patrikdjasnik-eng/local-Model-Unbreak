@@ -51,6 +51,7 @@ Repository-level project documents live one level above this directory:
 - [security/DECEPTION_MODE.md](security/DECEPTION_MODE.md) — fake files, credentials, and services.
 - [security/INCIDENT_RESPONSE.md](security/INCIDENT_RESPONSE.md) — containment and recovery.
 - [security/SECURITY_EVENTS.md](security/SECURITY_EVENTS.md) — normalized security event contract.
+- [PRIVATE_MODULE_BOUNDARY.md](PRIVATE_MODULE_BOUNDARY.md) — public/private extension boundary and migration rules.
 
 ## Document roles
 
