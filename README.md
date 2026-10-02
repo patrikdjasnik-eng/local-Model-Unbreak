@@ -127,16 +127,25 @@ See [ROADMAP.md](ROADMAP.md) for milestones and [CHANGELOG.md](CHANGELOG.md) for
 
 | Document | Purpose |
 | --- | --- |
+| [docs/README.md](docs/README.md) | Documentation index and reading map |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | High-level system architecture and boundaries |
 | [docs/TECHNICAL_DESIGN.md](docs/TECHNICAL_DESIGN.md) | Components, interfaces, planner design, and runtime flow |
+| [docs/CONFIGURATION.md](docs/CONFIGURATION.md) | Configuration precedence, defaults, validation, and secrets |
 | [docs/BENCHMARKING.md](docs/BENCHMARKING.md) | Reproducible performance methodology |
+| [docs/REMOTE_NODES.md](docs/REMOTE_NODES.md) | Trusted remote compute design and network behavior |
 | [docs/THREAT_MODEL.md](docs/THREAT_MODEL.md) | Security assumptions and trust boundaries |
+| [docs/PRIVACY.md](docs/PRIVACY.md) | Local-first privacy and telemetry principles |
+| [docs/TESTING.md](docs/TESTING.md) | Unit, integration, hardware, and network test strategy |
+| [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md) | Planned and verified platform/backend support |
+| [docs/FAQ.md](docs/FAQ.md) | Concise answers to common design questions |
 | [docs/DECISIONS.md](docs/DECISIONS.md) | Architecture decision record index |
 | [ROADMAP.md](ROADMAP.md) | Delivery milestones |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution workflow |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution workflow and commit convention |
 | [SECURITY.md](SECURITY.md) | Vulnerability reporting and security policy |
 | [GOVERNANCE.md](GOVERNANCE.md) | Project decision-making model |
 | [SUPPORT.md](SUPPORT.md) | Support boundaries and bug-report guidance |
+| [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Community behavior expectations |
+| [CHANGELOG.md](CHANGELOG.md) | Notable repository and release changes |
 
 ## Non-goals
 
