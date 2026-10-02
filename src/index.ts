@@ -1,5 +1,7 @@
 export * from "./core/index.js";
 export * from "./extensions/index.js";
+export * from "./gguf/index.js";
+export * from "./hardware/index.js";
 export * from "./model/index.js";
 export * from "./sandbox/index.js";
 export * from "./security/events/index.js";
