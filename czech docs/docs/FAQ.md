@@ -51,3 +51,27 @@ Může být bezpečnější, ale mění trust boundary. Early design počítá s
 ## Kde začít s contribution?
 
 Přečti si [../CONTRIBUTING.md](../CONTRIBUTING.md) a pak vyber malý measurable problém: GGUF metadata parsing, memory estimation fixtures, planner edge cases, benchmark reproducibility nebo security review.
+
+## Můžu ve Free použít vlastní GGUF?
+
+Ano. Plánovaný tier model dovoluje user-provided GGUF, pokud active runtime podporuje architecture. Premium je za orchestration/optimization features Model Unbreak, ne za zákaz open model files.
+
+## Cloneuje Model Unbreak celé model repository?
+
+Defaultně ne. Catalog resolve exact selected artifact a preferuje artifact-level download přes provider API. Full Git/Git LFS clone je fallback pouze pokud je potřeba a user ho explicitně schválí.
+
+## Jaké modely budou v prvním menu?
+
+Initial catalog zahrnuje lehké Free entries Qwen3.5 0.8B, Qwen3 1.7B/4B, SmolLM3 3B a Qwen2.5-Coder 1.5B a silnější premium-curated Qwen3 8B, Qwen2.5-Coder 7B, gpt-oss 20B a Gemma 3 12B/27B. Exact sources/quantizations jsou v [MODEL_CATALOG.md](MODEL_CATALOG.md).
+
+## Co je Model Clone?
+
+Research workflow, který používá větší teacher a synthetic nebo explicitně selected user data k vytvoření/evaluation menšího specialized student modelu nebo adapteru. Není to perfect copy teacheru. Viz [MODEL_CLONING.md](MODEL_CLONING.md).
+
+## Co je Creeping Frost?
+
+Creeping Frost AI Firewall v2 je plánovaný central capability policy engine. Vyhodnocuje network access, host filesystem access, process spawning, remote compute, VRAM/RAM allocation, model acquisition a clone training přes `ALLOW / ASK / DENY` + optional restrictions.
+
+## Útočí Security Lab zpět na suspicious systémy?
+
+Ne. HoneyNet, Deception Mode, Threat Hunting a Defense Validation jsou defensive/local mechanisms. Decoys jsou synthetic, validation míří na owned/authorized systems a design výslovně vylučuje retaliation.
