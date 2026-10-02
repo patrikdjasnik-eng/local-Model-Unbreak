@@ -55,6 +55,47 @@ This file indexes decisions that materially shape Model Unbreak. The goal is to 
 
 **Reason:** A narrow initial backend makes memory estimation, benchmark normalization, and planner correctness tractable.
 
+
+## ADR-007 — Artifact-level model acquisition
+
+**Status:** Accepted.
+
+**Decision:** Download the exact model artifact selected by the catalog/planner instead of cloning an entire model repository by default.
+
+**Reason:** Model repositories may contain many quantizations, BF16 weights, projector files, and large LFS/Xet objects. Exact artifact retrieval minimizes bandwidth, disk usage, and accidental trust expansion.
+
+## ADR-008 — Free users may import compatible GGUF files
+
+**Status:** Accepted.
+
+**Decision:** Product tier does not block users from importing their own GGUF model when the active runtime supports it.
+
+**Reason:** Premium value belongs in orchestration, planning, remote compute, cloning, and automation rather than artificial ownership of upstream open models.
+
+## ADR-009 — Creeping Frost is the central security enforcement engine
+
+**Status:** Accepted.
+
+**Decision:** Security-sensitive capabilities are evaluated through a shared `ALLOW / ASK / DENY` policy model with optional restrictions.
+
+**Reason:** Network, filesystem, processes, VRAM/RAM, remote compute, acquisition, and clone training need consistent policy semantics and explanations.
+
+## ADR-010 — Basic security is not a premium-only feature
+
+**Status:** Accepted.
+
+**Decision:** Baseline artifact integrity, quarantine, SafeCell policy, and essential Creeping Frost enforcement are product safety controls available regardless of tier.
+
+**Reason:** Security should not become weaker because a user has not purchased advanced orchestration features.
+
+## ADR-011 — Model Clone requires explicit data-source consent
+
+**Status:** Accepted.
+
+**Decision:** Clone jobs default to synthetic-only data. Conversations, coding sessions, folders, and custom datasets require explicit per-job selection/approval.
+
+**Reason:** Personalization must not silently convert unrelated user data into training data.
+
 ## When an ADR is required
 
 Create or update a decision when changing:
