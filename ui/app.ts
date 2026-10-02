@@ -425,7 +425,7 @@ app.innerHTML = `
   </main>
 `;
 
-await import("./llm.js");
+await Promise.all([import("./llm.js"), import("./runtime.js")]);
 
 const toastStack = document.querySelector<HTMLDivElement>(".toast-stack");
 const modal = document.querySelector<HTMLDivElement>("[data-modal]");
@@ -497,16 +497,8 @@ document.querySelectorAll<HTMLButtonElement>("[data-action]").forEach((button) =
     };
 
     if (action === "refresh") {
-      document.querySelectorAll<HTMLElement>("[data-metric]").forEach((row, index) => {
-        const base = [12, 14, 22, 22, 38][index] ?? 20;
-        const delta = Math.floor(Math.random() * 7) - 3;
-        const next = Math.max(3, Math.min(92, base + delta));
-        const label = row.querySelector<HTMLElement>("[data-usage-label]");
-        const bar = row.querySelector<HTMLElement>("[data-usage-bar]");
-        if (label) label.textContent = `${next}%`;
-        if (bar) bar.style.width = `${next}%`;
-      });
-      showToast("System snapshot refreshed.", "success");
+      document.dispatchEvent(new CustomEvent("model-unbreak:refresh-runtime"));
+      showToast("System snapshot refresh requested.", "success");
       return;
     }
 
