@@ -52,6 +52,7 @@ Repository-level project documents live one level above this directory:
 - [security/INCIDENT_RESPONSE.md](security/INCIDENT_RESPONSE.md) — containment and recovery.
 - [security/SECURITY_EVENTS.md](security/SECURITY_EVENTS.md) — normalized security event contract.
 - [PRIVATE_MODULE_BOUNDARY.md](PRIVATE_MODULE_BOUNDARY.md) — public/private extension boundary and migration rules.
+- [CONSOLIDATION.md](CONSOLIDATION.md) — migration map from existing runtime/security projects into the unified core.
 
 ## Document roles
 
