@@ -211,8 +211,10 @@ export function createApiHandler(deps: BackendDependencies): (request: Request) 
 
       const started = now();
       try {
+        const runtime = await deps.runtime.ensureActive(model);
+        const runtimeModel = runtime.modelName ?? model;
         const content = await deps.llama.chat(
-          model,
+          runtimeModel,
           [{ role: "user", content: "Reply with a concise one-sentence description of local LLM inference." }],
           { temperature: 0, maxTokens: 64 }
         );
@@ -221,7 +223,8 @@ export function createApiHandler(deps: BackendDependencies): (request: Request) 
         const estimatedTokensPerSecond = Number(((estimatedTokens * 1000) / elapsedMs).toFixed(2));
 
         return json({
-          model,
+          model: runtimeModel,
+          runtime,
           elapsedMs,
           outputCharacters: content.length,
           estimatedTokens,
