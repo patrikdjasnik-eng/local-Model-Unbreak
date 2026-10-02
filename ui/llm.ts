@@ -46,7 +46,7 @@ export class LocalLlmClient {
     const response = await fetch(`${this.baseUrl}/v1/models`, {
       method: "GET",
       headers: { Accept: "application/json" },
-      signal
+      ...(signal ? { signal } : {})
     });
 
     if (!response.ok) throw new Error(`llama.cpp models request failed: ${response.status}`);
@@ -78,7 +78,7 @@ export class LocalLlmClient {
         max_tokens: options.maxTokens ?? 1024,
         stream: false
       }),
-      signal: options.signal
+      ...(options.signal ? { signal: options.signal } : {})
     });
 
     if (!response.ok) {
