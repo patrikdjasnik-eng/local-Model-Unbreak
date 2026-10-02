@@ -374,3 +374,45 @@ Remote execution changes the trust model substantially. Do not expose experiment
 ## License
 
 A public-source license has not been selected yet. Until a license is added, the repository should not be assumed to grant reuse rights beyond GitHub's normal viewing and forking functionality.
+
+
+## Local demo runtime
+
+The current demo includes a localhost-only TypeScript backend, live hardware telemetry and a llama.cpp chat bridge.
+
+Requirements:
+
+- Node.js 20+
+- npm
+- optional: NVIDIA driver with `nvidia-smi`
+- llama.cpp server listening on `127.0.0.1:8080`
+
+Install and verify:
+
+```powershell
+npm install
+npm run verify
+```
+
+Start UI and backend together:
+
+```powershell
+npm run dev
+```
+
+Local services:
+
+- UI: `http://127.0.0.1:5173`
+- Model Unbreak backend: `http://127.0.0.1:8787`
+- llama.cpp: `http://127.0.0.1:8080`
+
+Backend endpoints:
+
+- `GET /api/health`
+- `GET /api/hardware`
+- `GET /api/models`
+- `POST /api/chat`
+- `POST /api/planner`
+- `POST /api/benchmark`
+
+The backend binds to loopback only and rejects non-loopback llama.cpp URLs in the demo configuration.
