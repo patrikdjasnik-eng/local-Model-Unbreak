@@ -201,6 +201,123 @@ Silné veřejné demo není „podívejte, umí to spustit llama.cpp“. Zajíma
 
 To je hlavní produktová hodnota, kterou má frontend komunikovat.
 
+
+## Vestavěný katalog modelů
+
+Model Unbreak má mít kurátorovaný katalog a současně dovolí **libovolný vlastní GGUF podporovaný aktivním runtime**. Free uživatel nebude blokován před importem velkého local GGUF. Premium znamená orchestration a optimization funkce Model Unbreak, ne vlastnictví upstream open modelu.
+
+### Free
+
+| Model | Kvant | Source | Hlavní použití |
+| --- | --- | --- | --- |
+| Qwen3.5 0.8B | Q8_0 | `ggml-org/Qwen3.5-0.8B-GGUF` | lehký general |
+| Qwen3 1.7B | Q4_K_M | `ggml-org/Qwen3-1.7B-GGUF` | general / reasoning |
+| SmolLM3 3B | Q4_K_M | `ggml-org/SmolLM3-3B-GGUF` | lehký multilingual chat |
+| Qwen3 4B | Q4_K_M | `ggml-org/Qwen3-4B-GGUF` | silnější general / reasoning |
+| Qwen2.5-Coder 1.5B Instruct | Q4_K_M | `tensorblock/Qwen2.5-Coder-1.5B-Instruct-GGUF` | lehký coding |
+
+### Premium-curated
+
+| Model | Kvant | Source | Hlavní použití |
+| --- | --- | --- | --- |
+| Qwen3 8B | Q4_K_M | `Qwen/Qwen3-8B-GGUF` | silnější general / reasoning |
+| Qwen2.5-Coder 7B Instruct | Q8_0 | `ggml-org/Qwen2.5-Coder-7B-Instruct-Q8_0-GGUF` | coding |
+| gpt-oss 20B | MXFP4 | `ggml-org/gpt-oss-20b-GGUF` | velký general / reasoning |
+| Gemma 3 12B IT | Q4_K_M | `ggml-org/gemma-3-12b-it-GGUF` | multimodal / general |
+| Gemma 3 27B IT | Q4_K_M | `ggml-org/gemma-3-27b-it-GGUF` | velký multimodal / general |
+
+Přesné filenames, sizes, licence, source URI a acquisition pravidla jsou v [docs/MODEL_CATALOG.md](docs/MODEL_CATALOG.md).
+
+### Download bez složité práce s model repem
+
+User nemusí znát Git LFS, Xet, repository layout ani quant filename.
+
+```text
+výběr task/model
+      ↓
+hardware fit
+      ↓
+exact artifact + licence
+      ↓
+explicitní souhlas
+      ↓
+artifact-level download
+      ↓
+integrity check
+      ↓
+quarantine
+      ↓
+GGUF/runtime compatibility
+      ↓
+trusted local model store
+```
+
+Model Unbreak preferuje přesné stažení artifactu z Hugging Face přes `huggingface_hub` místo clone celého model repository. Git/Git LFS je fallback tam, kde artifact-level retrieval není dostupné.
+
+Download používá partial/staging stav, takže lze bezpečně implementovat pause, resume, cancel, retry a cleanup bez toho, aby incomplete file vypadal jako installed model. Viz [docs/MODEL_ACQUISITION.md](docs/MODEL_ACQUISITION.md).
+
+## Model Clone
+
+Budoucí **Model Clone / Self-Distill** může použít větší teacher model k vytvoření menšího specializovaného student modelu nebo adapteru.
+
+```text
+velký teacher
+     ↓
+synthetic nebo explicitně vybraná data
+     ↓
+LoRA / QLoRA / distillation
+     ↓
+evaluation
+     ↓
+menší local clone
+```
+
+Personal conversations, coding sessions, folders ani datasety se nikdy nevyberou tiše. Default je synthetic-only. Viz [docs/MODEL_CLONING.md](docs/MODEL_CLONING.md).
+
+## Security Lab
+
+Security je viditelná část produktu, ne schovaný checkbox.
+
+Plánovaný Security Lab spojuje:
+
+- **Creeping Frost AI Firewall v2** — centrální `ALLOW / ASK / DENY` capability policy a enforcement,
+- **SafeCell** — disposable runtime isolation a virtual/fake-storage boundary,
+- **HoneyNet** — izolované decoy services a canary resources,
+- **Threat Hunting** — behavior baseline, rules a correlation,
+- **Defense Validation** — non-destructive ověřování controls na owned/authorized systems,
+- **Supply Chain Guard** — source, revision, licence, hash, quarantine a promotion,
+- **Node Attestation** — trust evidence remote GPU workers,
+- **Deception Mode** — fake credentials/files/services pro detection unexpected behavior,
+- **Incident Response** — containment, evidence, recovery a incident timeline.
+
+```text
+Model source
+     ↓
+Supply Chain Guard
+     ↓
+Quarantine
+     ↓
+SafeCell
+     ↓
+Creeping Frost
+     ↓
+Runtime / Remote Node
+     ↓
+Threat Hunter + HoneyNet
+     ↓
+Incident Engine
+```
+
+Security modes: `STANDARD`, `PRIVATE`, `HARDENED`, `DECEPTION`, `AIRGAP`.
+
+Creeping Frost je capability-aware: řídí network, filesystem, processes, model acquisition, RAM/VRAM allocation, remote compute, clone training a security actions. Threat signals mohou policy automaticky **zpřísnit**, pokud je to předem povolené, ale nikdy ji tiše neoslabí.
+
+Celý návrh je v [docs/security/README.md](docs/security/README.md).
+
+## Frontend specifikace
+
+Detailní mockup kontrakt je v [docs/FRONTEND_UX_SPEC.md](docs/FRONTEND_UX_SPEC.md). Frontend zahrnuje Model Catalog, Planner, Hardware, Benchmarks, Clone Lab, Security Lab, Nodes a Settings s explicit consent a jasným rozlišením measured vs estimated dat.
+
 ## Stav projektu
 
 Model Unbreak je nyní ve fázi **návrhu a prototypu**. Dokumentace definuje zamýšlenou architekturu a bezpečnostní hranice ještě před implementací.
