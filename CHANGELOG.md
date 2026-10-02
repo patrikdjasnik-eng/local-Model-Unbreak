@@ -10,6 +10,12 @@ Notable project changes are documented here. The project is pre-release, so entr
 
 ### Added
 
+- Curated Free/Premium GGUF catalog with exact upstream artifacts and quantizations.
+- Explicit-consent model acquisition flow with artifact-level downloads, partial/resume state, integrity verification, and quarantine.
+- Detailed frontend UX specification for Catalog, Planner, Clone Lab, Security Lab, and remote nodes.
+- Model Clone / Self-Distill research specification with synthetic-only default and explicit data consent.
+- Security Lab documentation: Creeping Frost AI Firewall v2, SafeCell, HoneyNet, Threat Hunting, Defense Validation, Supply Chain Security, Node Attestation, Deception Mode, Incident Response, and normalized Security Events.
+
 - Initial project definition for explainable GGUF runtime planning.
 - Architecture, roadmap, security, governance, support, and contribution documentation.
 - Technical design for hardware probing, model inspection, benchmarking, fit planning, validation, and backend adapters.
