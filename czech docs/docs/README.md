@@ -33,6 +33,25 @@ Repository-level projektové dokumenty jsou o úroveň výše:
 - [CODE_OF_CONDUCT.md](../CODE_OF_CONDUCT.md)
 - [CHANGELOG.md](../CHANGELOG.md)
 
+
+## Produktové a bezpečnostní specifikace
+
+- [MODEL_CATALOG.md](MODEL_CATALOG.md) — Free/Premium model menu, kvantizace, přesné upstream artifacty, licence a tier rules.
+- [MODEL_ACQUISITION.md](MODEL_ACQUISITION.md) — consent, artifact-level download, partial/resume, quarantine, integrity a promotion.
+- [MODEL_CLONING.md](MODEL_CLONING.md) — Quick/Personal/Deep Clone, explicitní výběr dat, training a evaluation.
+- [FRONTEND_UX_SPEC.md](FRONTEND_UX_SPEC.md) — detailní frontend mockup a click-through stories.
+- [security/README.md](security/README.md) — vstupní bod Security Lab architektury.
+- [security/CREEPING_FROST.md](security/CREEPING_FROST.md) — centrální capability-aware AI firewall.
+- [security/SAFECELL.md](security/SAFECELL.md) — disposable runtime isolation.
+- [security/HONEYNET.md](security/HONEYNET.md) — decoy network a canaries.
+- [security/THREAT_HUNTING.md](security/THREAT_HUNTING.md) — baselines, rules, correlation a severity.
+- [security/DEFENSE_VALIDATION.md](security/DEFENSE_VALIDATION.md) — autorizovaná non-destructive validation controls.
+- [security/SUPPLY_CHAIN_SECURITY.md](security/SUPPLY_CHAIN_SECURITY.md) — provenance, hashes a runtime/model trust.
+- [security/NODE_ATTESTATION.md](security/NODE_ATTESTATION.md) — remote-node trust evidence.
+- [security/DECEPTION_MODE.md](security/DECEPTION_MODE.md) — fake files, credentials a services.
+- [security/INCIDENT_RESPONSE.md](security/INCIDENT_RESPONSE.md) — containment a recovery.
+- [security/SECURITY_EVENTS.md](security/SECURITY_EVENTS.md) — normalized security event contract.
+
 ## Role dokumentů
 
 Dokumenty jsou záměrně oddělené:
