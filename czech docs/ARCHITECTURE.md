@@ -128,6 +128,37 @@ aktualizace lokálního benchmark profilu
 - Backend adaptéry musí při nepodporovaných capabilities failnout bezpečně.
 - Privacy policy má přednost před výkonem.
 
+
+## Rozšířená produktová architektura
+
+Model Unbreak definuje čtyři spolupracující planes:
+
+```text
+MODEL PLANE
+Catalog → Acquisition → Quarantine → Model Store
+
+COMPUTE PLANE
+Hardware Probe → Fit Planner → Local / Hybrid / Remote Runtime
+
+CLONE PLANE
+Teacher → Data Consent → Training → Evaluation → Student Artifact
+
+SECURITY PLANE
+Supply Chain → SafeCell → Creeping Frost → Threat Hunter → Incident Engine
+```
+
+### Model Catalog a Acquisition
+
+Catalog resolve přesný artifact a quantization. Acquisition je explicit-consent, artifact-level, resumable, integrity-checked a před promotion jde do quarantine. Viz [docs/MODEL_CATALOG.md](docs/MODEL_CATALOG.md) a [docs/MODEL_ACQUISITION.md](docs/MODEL_ACQUISITION.md).
+
+### Model Clone
+
+Clone workflow je oddělený od ordinary inference. Vyžaduje explicitní data-source consent, isolated training execution, evaluation a artifact lifecycle. Viz [docs/MODEL_CLONING.md](docs/MODEL_CLONING.md).
+
+### Security Lab
+
+Creeping Frost je centrální enforcement layer. SafeCell izoluje execution, HoneyNet/Deception dodává decoys, Threat Hunter interpretuje behavior, Supply Chain Guard ověřuje artifacts, Node Attestation hodnotí remote workers a Incident Response uchovává evidence/recovery state. Viz [docs/security/README.md](docs/security/README.md).
+
 ## Stav
 
 Tato architektura je design kontrakt, ne tvrzení, že každá komponenta už existuje. Změny trust boundaries, planner semantics nebo backend contracts mají být zaznamenány v [docs/DECISIONS.md](docs/DECISIONS.md).
