@@ -10,7 +10,7 @@ describe("LocalLlmClient", () => {
     }), { status: 200, headers: { "Content-Type": "application/json" } }));
     vi.stubGlobal("fetch", fetchMock);
 
-    const client = new LocalLlmClient("/llama");
+    const client = new LocalLlmClient("/api");
     await expect(client.listModels()).resolves.toEqual(["qwen2.5-coder-7b", "llama-3.1-8b"]);
   });
 
@@ -29,7 +29,7 @@ describe("LocalLlmClient", () => {
     expect(answer).toBe("Lokální odpověď.");
     const init = fetchMock.mock.calls[0]?.[1] as RequestInit;
     const body = JSON.parse(String(init.body));
-    expect(body).toMatchObject({ model: "qwen", temperature: 0.4, max_tokens: 512, stream: false });
+    expect(body).toMatchObject({ model: "qwen", temperature: 0.4, maxTokens: 512, stream: false });
   });
 
   it("does not fake success on HTTP errors", async () => {
@@ -70,6 +70,6 @@ describe("local-only proxy configuration", () => {
 
     expect(config).toContain("127.0.0.1");
     expect(config).toContain("localhost");
-    expect(config).toContain("VITE_LLAMA_URL must point to localhost/loopback");
+    expect(config).toContain("VITE_BACKEND_URL must point to localhost/loopback");
   });
 });
