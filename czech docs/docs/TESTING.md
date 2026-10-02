@@ -74,6 +74,49 @@ Remote-node tests mají simulovat:
 
 Planner bug má přidat minimized fixture, kdykoli je to praktické. Regression fixtures nesmí obsahovat private hostnames, user prompts, access tokens ani model files s omezenou redistributability.
 
+
+## Model acquisition testy
+
+Acquisition tests pokrývají:
+
+- exact artifact selection,
+- consent před transferem,
+- insufficient disk-space preflight,
+- pause/resume/cancel,
+- partial files nikdy nejsou promoted jako installed,
+- hash mismatch zůstává blocked/quarantined,
+- unsupported GGUF architecture recovery,
+- runtime-update consent oddělený od model-download consent,
+- license-gated artifact bez acceptance nejde stáhnout.
+
+## Security Lab testy
+
+Security controls potřebují deterministic fixtures pro:
+
+- Creeping Frost `ALLOW / ASK / DENY` a restrictions,
+- SafeCell denied host-path access,
+- network deny/allowlist behavior,
+- synthetic canary events,
+- Threat Hunter correlation,
+- node trust drift/revocation,
+- normalized event schema,
+- incident snapshot references,
+- fail-closed behavior při unavailable enforcement.
+
+Security tests musí odlišovat `PASS`, `FAIL`, `WARNING`, `NOT_SUPPORTED` a `NOT_TESTED`.
+
+## Clone testy
+
+Clone workflow tests pokrývají:
+
+- synthetic-only default,
+- per-job data-source consent,
+- folder scope boundaries,
+- dataset preview/scrubbing path,
+- training cancellation cleanup,
+- teacher/student evaluation reproducibility,
+- remote training blocked bez trusted-node approval.
+
 ## Definition of done
 
 Behavioral change je hotová, když:
