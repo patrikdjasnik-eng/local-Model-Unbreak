@@ -320,6 +320,26 @@ The full security design starts at [docs/security/README.md](docs/security/READM
 
 The detailed mockup contract is documented in [docs/FRONTEND_UX_SPEC.md](docs/FRONTEND_UX_SPEC.md). The frontend includes Model Catalog, Planner, Hardware, Benchmarks, Clone Lab, Security Lab, Nodes, and Settings, with explicit consent and clear measured-vs-estimated states.
 
+## M1 implementation
+
+The first local-inspection implementation is being developed on `feature/m1-local-inspector`.
+
+Implemented in that branch:
+
+- CPU/RAM probe with CPU-only fallback,
+- NVIDIA VRAM probe through `nvidia-smi` without shell execution,
+- bounded GGUF v2/v3 metadata reader,
+- common `general.file_type` quantization mapping,
+- KV-cache/runtime/safety memory estimator with explicit confidence,
+- local `FULL_GPU`, `GPU_RAM_OFFLOAD`, `CPU_ONLY`, and `UNSUPPORTED` planning,
+- Creeping Frost gates for read-only model/hardware inspection,
+- `model-unbreak inspect <model.gguf>` with text and `--json` output,
+- synthetic GGUF and hardware/planner unit tests.
+
+The implementation intentionally labels unknown data instead of inventing precision. Remote execution and automatic model download are not part of M1.
+
+Validation is still required before merging: the repository's GitHub Actions jobs currently terminate before a runner starts, so the branch is not considered green yet.
+
 ## Project status
 
 Model Unbreak is currently in the **design and prototype stage**. The documentation defines the intended architecture and safety boundaries before implementation starts.
