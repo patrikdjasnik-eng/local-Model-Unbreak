@@ -50,3 +50,29 @@ Diagnostic bundles mají být sanitized by construction. Pokud jsou identifiers 
 ## Budoucí služby
 
 Pokud projekt později přidá optional hosted services, public relays nebo cloud coordination, vyžaduje to samostatný privacy review a explicit opt-in.
+
+## Privacy model acquisition
+
+Catalog browsing může vyžadovat network access k upstream registries. Model download consent musí ukázat selected provider a artifact.
+
+Inference permission je oddělené od download permission: povolení downloadu z registry nedává runtime obecný internet access.
+
+## Model Clone privacy
+
+Clone jobs defaultují na synthetic-only data.
+
+Explicitní selection vyžadují:
+
+- conversations,
+- coding sessions,
+- local folders,
+- custom datasets,
+- remote training.
+
+User má před trainingem vidět included records a detected secrets.
+
+## Security telemetry privacy
+
+Security Lab ukládá behavioral metadata defaultně local. Canary IDs, event types, policy results, hashes a resource classes mají přednost před raw personal content.
+
+Deception assets jsou synthetic. Real credentials se nikdy nekopírují do HoneyNet jen kvůli věrohodnosti decoys.
