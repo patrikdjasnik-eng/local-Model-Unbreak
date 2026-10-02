@@ -425,7 +425,7 @@ app.innerHTML = `
   </main>
 `;
 
-await Promise.all([import("./llm.js"), import("./runtime.js")]);
+await Promise.all([import("./llm.js"), import("./runtime.js"), import("./dashboard-enhancements.js")]);
 
 const toastStack = document.querySelector<HTMLDivElement>(".toast-stack");
 const modal = document.querySelector<HTMLDivElement>("[data-modal]");
@@ -463,25 +463,100 @@ document.querySelectorAll<HTMLButtonElement>("[data-nav]").forEach((button) => {
     button.classList.add("active");
 
     const destination = button.dataset.nav ?? "Dashboard";
-    if (destination === "Dashboard") {
+    const openDashboard = (): void => {
       document.dispatchEvent(new CustomEvent("model-unbreak:navigate", { detail: { view: "dashboard" } }));
-      showToast("Dashboard is active.");
+    };
+
+    if (destination === "Dashboard") {
+      openDashboard();
       return;
     }
 
-    if (destination === "Local AI") {
+    if (destination === "Local AI" || destination === "Model Inspector" || destination === "Catalog") {
       document.dispatchEvent(new CustomEvent("model-unbreak:navigate", { detail: { view: "local-ai" } }));
       return;
     }
 
-    document.dispatchEvent(new CustomEvent("model-unbreak:navigate", { detail: { view: "dashboard" } }));
+    openDashboard();
 
-    openModal(
-      destination,
-      `${destination} is wired into the navigation shell. The dedicated workspace can now be connected to the project runtime.`
-    );
+    if (destination === "Hardware") {
+      document.dispatchEvent(new CustomEvent("model-unbreak:refresh-runtime"));
+      document.querySelector(".snapshot-panel")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      showToast("Hardware telemetry refreshed.", "success");
+      return;
+    }
+
+    if (destination === "Planner") {
+      void runPlanner();
+      return;
+    }
+
+    if (destination === "Security Lab") {
+      document.querySelector(".security-panel")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+
+    if (destination === "Nodes") {
+      document.querySelector(".nodes-panel")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+
+    openModal("Settings", "Runtime preferences are stored locally. Advanced user profiles will plug into this screen later.");
   });
 });
+
+async function runPlanner(): Promise<void> {
+  try {
+    const [hardwareResponse, modelsResponse] = await Promise.all([
+      fetch("/api/hardware", { headers: { Accept: "application/json" } }),
+      fetch("/api/models", { headers: { Accept: "application/json" } })
+    ]);
+
+    if (!hardwareResponse.ok || !modelsResponse.ok) {
+      throw new Error("Runtime data is not available.");
+    }
+
+    const hardware = await hardwareResponse.json() as {
+      memory: { totalBytes: number };
+      gpu: { memoryTotalMb: number } | null;
+    };
+    const models = await modelsResponse.json() as {
+      data?: Array<{ sizeGb?: number; name?: string }>;
+    };
+
+    const model = models.data?.[0];
+    const modelSizeGb = model?.sizeGb ?? 4.5;
+    const ramGb = hardware.memory.totalBytes / 1024 ** 3;
+    const vramGb = (hardware.gpu?.memoryTotalMb ?? 0) / 1024;
+
+    const response = await fetch("/api/planner", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({
+        modelSizeGb,
+        contextSize: 4096,
+        ramGb,
+        vramGb
+      })
+    });
+
+    if (!response.ok) throw new Error("Planner request failed.");
+
+    const plan = await response.json() as {
+      mode: string;
+      feasible: boolean;
+      estimatedWorkingSetGb: number;
+      reason: string;
+    };
+
+    openModal(
+      plan.feasible ? `Recommended plan · ${plan.mode}` : "Model does not fit",
+      `${model?.name ?? "Selected model"} · estimated working set ${plan.estimatedWorkingSetGb} GB. ${plan.reason}`
+    );
+  } catch (error) {
+    openModal("Planner unavailable", error instanceof Error ? error.message : "Planner request failed.");
+  }
+}
 
 document.querySelectorAll<HTMLButtonElement>("[data-action]").forEach((button) => {
   button.addEventListener("click", () => {
@@ -496,9 +571,20 @@ document.querySelectorAll<HTMLButtonElement>("[data-action]").forEach((button) =
       "add-node": ["Add inference node", "Pair another local or remote inference node with explicit permission boundaries."]
     };
 
-    if (action === "refresh") {
+    if (action === "refresh" || action === "hardware") {
       document.dispatchEvent(new CustomEvent("model-unbreak:refresh-runtime"));
-      showToast("System snapshot refresh requested.", "success");
+      document.querySelector(".snapshot-panel")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      showToast("Hardware telemetry refreshed.", "success");
+      return;
+    }
+
+    if (action === "inspect" || action === "catalog") {
+      document.dispatchEvent(new CustomEvent("model-unbreak:navigate", { detail: { view: "local-ai" } }));
+      return;
+    }
+
+    if (action === "planner" || action === "feasibility") {
+      void runPlanner();
       return;
     }
 
