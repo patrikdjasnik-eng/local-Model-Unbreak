@@ -61,3 +61,29 @@ This document separates planned support from verified support. Until implementat
 ## Compatibility rule
 
 A device, backend, or platform is not marked `Verified` merely because upstream software claims support. Model Unbreak verification requires successful planner behavior, launch, inference, metrics collection, and failure cleanup under a documented configuration.
+
+## GGUF compatibility policy
+
+Model Unbreak should not claim support for “every GGUF ever created.” GGUF is a container format; the active runtime must understand the model architecture and required tensor/runtime features.
+
+Compatibility is evaluated in layers:
+
+```text
+GGUF container readable?
+      ↓
+architecture known to runtime?
+      ↓
+required backend capability available?
+      ↓
+Model Unbreak policy/test status?
+      ↓
+SUPPORTED / EXPERIMENTAL / VERIFIED / UNSUPPORTED
+```
+
+A user may import any GGUF file. If the active runtime cannot load its architecture, Model Unbreak may offer a separately consented runtime update when an approved newer runtime supports it.
+
+## Curated catalog compatibility
+
+The built-in model menu is documented in [MODEL_CATALOG.md](MODEL_CATALOG.md). Catalog entries record exact source, artifact, quantization, and license. A catalog entry being present does not automatically mean every hardware configuration can run it.
+
+Free/Premium is a product-feature boundary, not a file-format compatibility boundary.
