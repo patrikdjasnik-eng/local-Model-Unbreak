@@ -80,6 +80,58 @@ Configuration validation should report:
 - whether the problem is fatal,
 - safe remediation where possible.
 
+
+## Catalog and acquisition configuration
+
+Planned configuration surface:
+
+```yaml
+catalog:
+  channel: stable
+  allowUserProvidedGguf: true
+
+acquisition:
+  provider: huggingface
+  requireConsent: true
+  partialDownloads: true
+  quarantine: true
+  verifySha256: true
+  diskSafetyReserveMiB: 2048
+```
+
+Repository credentials, if ever required for gated/private artifacts, belong in secret storage rather than this file.
+
+## Security Lab configuration
+
+```yaml
+security:
+  mode: hardened
+  creepingFrost:
+    defaultDecision: ask
+    adaptiveTightening: true
+  safeCell:
+    requiredForUnknownArtifacts: true
+  network:
+    inferenceEgress: deny
+  deception:
+    enabled: false
+  evidence:
+    localOnly: true
+```
+
+Security settings may be tightened by higher-precedence policy. A lower-precedence project file must not silently weaken an administrator/user security policy.
+
+## Clone configuration
+
+```yaml
+clone:
+  defaultDataSource: synthetic-only
+  requireDataPreview: true
+  allowRemoteTraining: false
+```
+
+Personal data sources require per-job consent even when cloning is globally enabled.
+
 ## Status
 
 The configuration format is intentionally not frozen before the first planner and backend adapter prototypes. Any future stable schema requires a decision record in [DECISIONS.md](DECISIONS.md).
