@@ -271,6 +271,70 @@ Useful runtime metrics include:
 
 Prompts and generated content should not be logged by default.
 
+
+## Model catalog and acquisition contracts
+
+The core runtime receives model artifacts through the catalog/acquisition layer rather than directly from UI strings.
+
+Suggested contracts:
+
+```ts
+export type CatalogEntry = {
+  id: string;
+  tier: "free" | "premium";
+  family: string;
+  format: "gguf";
+  quantization: string;
+  repoId: string;
+  filename: string;
+  revision: string;
+  licenseId: string;
+};
+
+export type AcquisitionState =
+  | "PENDING_CONSENT"
+  | "DOWNLOADING"
+  | "PAUSED"
+  | "QUARANTINED"
+  | "VERIFYING"
+  | "READY"
+  | "BLOCKED"
+  | "FAILED";
+```
+
+The acquisition service must separate network download from inference execution permissions.
+
+## Security control plane
+
+Security modules communicate through normalized events and structured capability requests.
+
+```ts
+export type CapabilityRequest = {
+  requesterId: string;
+  capability: string;
+  resource?: string;
+  reason: string;
+  requestedAt: string;
+};
+
+export type CapabilityDecision = {
+  decision: "ALLOW" | "ASK" | "DENY";
+  ruleId?: string;
+  restrictions?: Record<string, string | number | boolean>;
+  explanation: string[];
+};
+```
+
+Creeping Frost evaluates the request; platform backends enforce the result. SafeCell, HoneyNet, Threat Hunter, Node Attestation, and Incident Response use the same event IDs and session IDs.
+
+See [security/README.md](security/README.md) and [security/SECURITY_EVENTS.md](security/SECURITY_EVENTS.md).
+
+## Clone pipeline boundary
+
+Clone jobs are not ordinary inference sessions. They have explicit dataset scope, teacher/student identities, training resources, security mode, and evaluation result.
+
+The training service may consume only data sources included in the approved clone-job manifest.
+
 ## Open design questions
 
 - How should KV-cache memory be estimated consistently across backend versions?
