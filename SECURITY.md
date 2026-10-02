@@ -60,6 +60,32 @@ The following are intentionally not security promises of the initial project:
 - multi-tenant isolation equivalent to a hardened cloud provider,
 - protection against a fully compromised operating system or GPU driver.
 
+
+## Security Lab architecture
+
+The project security architecture is documented in [docs/security/README.md](docs/security/README.md).
+
+Core controls:
+
+- **Creeping Frost AI Firewall v2** — capability-aware `ALLOW / ASK / DENY` policy and restrictions.
+- **SafeCell** — disposable runtime/filesystem/network containment.
+- **HoneyNet + Deception Mode** — synthetic canaries and decoy services without real credentials.
+- **Threat Hunting** — baseline-aware behavioral monitoring and correlation.
+- **Supply Chain Guard** — exact artifact source, revision, license, hashes, quarantine, and promotion.
+- **Node Attestation** — remote-worker identity and drift evidence.
+- **Defense Validation** — non-destructive validation only on owned or explicitly authorized systems.
+- **Incident Response** — containment, evidence preservation, trust changes, and recovery.
+
+Security functionality is not intended to be paywalled at the basic protection level. Premium features may add history, policy automation, remote orchestration, and richer reporting, but baseline quarantine/isolation/integrity protections remain product safety controls.
+
+## Model acquisition security
+
+Model installation follows [docs/MODEL_ACQUISITION.md](docs/MODEL_ACQUISITION.md). A downloaded file is staged and quarantined before it can become a trusted local model. Runtime updates follow the same supply-chain expectations.
+
+## Cloning security
+
+Model Clone workflows follow [docs/MODEL_CLONING.md](docs/MODEL_CLONING.md). User conversations, source folders, code sessions, or datasets are never silently included in training. Remote training requires explicit approval and a trusted/attested node.
+
 ## Disclosure
 
 Once a vulnerability is fixed, the project may publish a concise advisory describing affected versions, severity, mitigation, and upgrade guidance without exposing unnecessary exploit detail.
