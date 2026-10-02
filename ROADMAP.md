@@ -92,6 +92,42 @@ Exit criterion: a multi-node plan is selected only when measured data supports i
 
 Exit criterion: publish benchmark evidence before presenting dynamic migration as production-ready.
 
+
+### M0.5 — Product surface and catalog contract
+
+- [x] Define curated Free/Premium model catalog
+- [x] Define exact artifact/source and quantization records
+- [x] Define artifact-level acquisition instead of full-repo clone by default
+- [x] Define explicit consent, partial/resume, quarantine, and integrity flow
+- [x] Define detailed frontend mockup contract
+- [ ] Freeze machine-readable catalog manifest schema
+
+Exit criterion: the frontend and future backend can refer to the same model IDs, sources, artifacts, and trust states.
+
+### M4.5 — Security Lab foundation
+
+- [x] Define Creeping Frost AI Firewall v2 policy model
+- [x] Define SafeCell isolation contract
+- [x] Define HoneyNet and Deception Mode
+- [x] Define Threat Hunting and normalized events
+- [x] Define supply-chain security and remote-node attestation
+- [x] Define defense validation and incident response
+- [ ] Implement platform-specific enforcement backends
+- [ ] Add security integration tests and evidence fixtures
+
+Exit criterion: every security badge shown in the UI maps to a testable control with explicit failure behavior.
+
+### M6.5 — Model Clone research
+
+- [x] Define Quick / Personal / Deep Clone workflow
+- [x] Define data-consent boundary
+- [x] Define teacher/student evaluation contract
+- [ ] Prototype local synthetic-only Quick Clone
+- [ ] Add secret-scrubbing and dataset review
+- [ ] Validate GGUF/export path for supported student runtimes
+
+Exit criterion: a smaller clone can be created and evaluated reproducibly without silently reading user data.
+
 ## Later research
 
 - speculative local/remote decoding,
