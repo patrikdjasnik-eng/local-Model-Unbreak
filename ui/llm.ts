@@ -120,7 +120,7 @@ export class LocalLlmClient {
         model: cleanModel,
         messages,
         temperature: options.temperature ?? 0.2,
-        max_tokens: options.maxTokens ?? 1024,
+        maxTokens: options.maxTokens ?? 1024,
         stream: false
       }),
       ...(options.signal ? { signal: options.signal } : {})
