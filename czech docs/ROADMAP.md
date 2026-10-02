@@ -8,7 +8,7 @@ Roadmapa je založena na milnících. Termíny jsou záměrně vynechány, dokud
 
 ## Aktuální zaměření
 
-Definovat důvěryhodný plánovací model ještě před budováním automatického remote execution.
+Implementovat a validovat M1 local hardware/GGUF inspection a první explainable local fit plan před budováním automatického remote execution.
 
 ## Milníky
 
@@ -32,6 +32,8 @@ Výstupní kritérium: contributors mohou implementovat komponenty bez hádání
 - [ ] Přidat unit testy pro unsupported a partial hardware
 
 Výstupní kritérium: `model-unbreak inspect model.gguf` vysvětlí, co model potřebuje a co stroj poskytuje.
+
+**Poznámka k implementaci:** M1 code existuje na `feature/m1-local-inspector`; checklist zůstává otevřený, dokud nejsou green typecheck, testy, build a CI validace.
 
 ### M2 — Reprodukovatelný lokální benchmark engine
 
