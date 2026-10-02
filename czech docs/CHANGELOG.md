@@ -10,6 +10,12 @@ Významné změny projektu jsou dokumentovány zde. Projekt je pre-release, tak�
 
 ### Přidáno
 
+- Kurátorovaný Free/Premium GGUF catalog s exact upstream artifacts a quantizations.
+- Explicit-consent model acquisition s artifact-level downloadem, partial/resume, integrity verification a quarantine.
+- Detailní frontend UX specification pro Catalog, Planner, Clone Lab, Security Lab a remote nodes.
+- Model Clone / Self-Distill research specification se synthetic-only defaultem a explicit data consent.
+- Security Lab dokumentace: Creeping Frost AI Firewall v2, SafeCell, HoneyNet, Threat Hunting, Defense Validation, Supply Chain Security, Node Attestation, Deception Mode, Incident Response a normalized Security Events.
+
 - Počáteční definice projektu pro explainable GGUF runtime planning.
 - Dokumentace architektury, roadmapy, security, governance, support a contributing.
 - Technical design pro hardware probing, model inspection, benchmarking, fit planning, validation a backend adapters.
