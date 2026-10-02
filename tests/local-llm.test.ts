@@ -6,12 +6,43 @@ describe("LocalLlmClient", () => {
 
   it("loads model identifiers from llama.cpp", async () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({
-      data: [{ id: "qwen2.5-coder-7b" }, { id: "llama-3.1-8b" }]
+      data: [
+        { id: "qwen-id", name: "qwen2.5-coder-7b.gguf", sizeGb: 4.68 },
+        { id: "llama-id", name: "llama-3.1-8b.gguf", sizeGb: 4.37 }
+      ],
+      runtime: null
     }), { status: 200, headers: { "Content-Type": "application/json" } }));
     vi.stubGlobal("fetch", fetchMock);
 
     const client = new LocalLlmClient("/api");
-    await expect(client.listModels()).resolves.toEqual(["qwen2.5-coder-7b", "llama-3.1-8b"]);
+    await expect(client.listModels()).resolves.toEqual({
+      models: [
+        { id: "qwen-id", name: "qwen2.5-coder-7b.gguf", sizeGb: 4.68 },
+        { id: "llama-id", name: "llama-3.1-8b.gguf", sizeGb: 4.37 }
+      ],
+      runtime: null
+    });
+  });
+
+  it("activates a selected model through the managed runtime", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({
+      status: "running",
+      modelId: "qwen-id",
+      modelName: "qwen.gguf",
+      profile: "gpu",
+      error: null
+    }), { status: 200, headers: { "Content-Type": "application/json" } }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const client = new LocalLlmClient("/api");
+    await expect(client.activateModel("qwen-id")).resolves.toMatchObject({
+      status: "running",
+      modelId: "qwen-id",
+      profile: "gpu"
+    });
+
+    const init = fetchMock.mock.calls[0]?.[1] as RequestInit;
+    expect(JSON.parse(String(init.body))).toEqual({ modelId: "qwen-id" });
   });
 
   it("sends OpenAI-compatible chat payload and returns model content", async () => {
@@ -20,7 +51,7 @@ describe("LocalLlmClient", () => {
     }), { status: 200, headers: { "Content-Type": "application/json" } }));
     vi.stubGlobal("fetch", fetchMock);
 
-    const client = new LocalLlmClient("/llama");
+    const client = new LocalLlmClient("/api");
     const answer = await client.chat("qwen", [{ role: "user", content: "Ahoj" }], {
       temperature: 0.4,
       maxTokens: 512
