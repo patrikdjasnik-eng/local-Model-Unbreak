@@ -55,6 +55,47 @@ Tento soubor indexuje rozhodnutí, která materiálně formují Model Unbreak. C
 
 **Důvod:** Narrow initial backend dělá memory estimation, benchmark normalization a planner correctness zvládnutelné.
 
+
+## ADR-007 — Artifact-level model acquisition
+
+**Status:** Accepted.
+
+**Rozhodnutí:** Defaultně stahovat přesný artifact vybraný catalog/plannerem místo clone celého model repository.
+
+**Důvod:** Model repa mohou obsahovat mnoho quantizations, BF16 weights, projector files a velké LFS/Xet objekty. Exact artifact retrieval minimalizuje bandwidth, disk usage a trust expansion.
+
+## ADR-008 — Free user může importovat compatible GGUF
+
+**Status:** Accepted.
+
+**Rozhodnutí:** Product tier neblokuje import vlastního GGUF, pokud jej active runtime podporuje.
+
+**Důvod:** Premium value patří do orchestration, planning, remote compute, cloning a automation, ne do umělého vlastnictví upstream open modelu.
+
+## ADR-009 — Creeping Frost je centrální security enforcement engine
+
+**Status:** Accepted.
+
+**Rozhodnutí:** Security-sensitive capabilities používají společný `ALLOW / ASK / DENY` policy model s volitelnými restrictions.
+
+**Důvod:** Network, filesystem, processes, VRAM/RAM, remote compute, acquisition a clone training potřebují consistent policy semantics a explanations.
+
+## ADR-010 — Basic security není premium-only feature
+
+**Status:** Accepted.
+
+**Rozhodnutí:** Baseline artifact integrity, quarantine, SafeCell policy a essential Creeping Frost enforcement jsou safety controls dostupné bez ohledu na tier.
+
+**Důvod:** Security nemá být slabší jen proto, že user nekoupil advanced orchestration features.
+
+## ADR-011 — Model Clone vyžaduje explicitní data-source consent
+
+**Status:** Accepted.
+
+**Rozhodnutí:** Clone jobs defaultují na synthetic-only data. Conversations, coding sessions, folders a custom datasets vyžadují explicitní per-job selection/approval.
+
+**Důvod:** Personalization nesmí tiše změnit unrelated user data na training data.
+
 ## Kdy je ADR povinné
 
 Vytvoř nebo aktualizuj decision při změně:
