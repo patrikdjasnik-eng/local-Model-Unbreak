@@ -73,6 +73,22 @@ Changes affecting trust boundaries, plan scoring semantics, persisted formats, o
 
 Do not open a public issue for a vulnerability that could enable remote code execution, unauthorized node use, credential exposure, or prompt/model exfiltration. Follow [SECURITY.md](SECURITY.md).
 
+
+## Security and product-documentation changes
+
+Changes affecting model sources, artifact acquisition, cloning, Creeping Frost policy, SafeCell boundaries, remote-node trust, or security events must update the corresponding specification in the same pull request.
+
+For catalog changes, include:
+
+- exact upstream repo ID,
+- exact filename/quantization,
+- license state,
+- source verification evidence,
+- whether the entry is Free or Premium-curated,
+- whether Model Unbreak has actually verified runtime behavior or only the upstream source.
+
+For Security Lab changes, include a failure-path test and update the threat model when a trust boundary changes.
+
 ## Pull request checklist
 
 - [ ] The change has a single clear purpose.
