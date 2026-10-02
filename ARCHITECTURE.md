@@ -128,6 +128,37 @@ update local benchmark profile
 - Backend adapters must fail closed on unsupported capabilities.
 - Privacy policy takes precedence over performance.
 
+
+## Extended product architecture
+
+Model Unbreak now defines four cooperating planes:
+
+```text
+MODEL PLANE
+Catalog → Acquisition → Quarantine → Model Store
+
+COMPUTE PLANE
+Hardware Probe → Fit Planner → Local / Hybrid / Remote Runtime
+
+CLONE PLANE
+Teacher → Data Consent → Training → Evaluation → Student Artifact
+
+SECURITY PLANE
+Supply Chain → SafeCell → Creeping Frost → Threat Hunter → Incident Engine
+```
+
+### Model Catalog and Acquisition
+
+The catalog resolves an exact artifact and quantization. Acquisition is explicit-consent, artifact-level, resumable, integrity-checked, and quarantined before promotion. See [docs/MODEL_CATALOG.md](docs/MODEL_CATALOG.md) and [docs/MODEL_ACQUISITION.md](docs/MODEL_ACQUISITION.md).
+
+### Model Clone
+
+Clone workflows are separate from ordinary inference. They require explicit data-source consent, isolated training execution, evaluation, and artifact lifecycle. See [docs/MODEL_CLONING.md](docs/MODEL_CLONING.md).
+
+### Security Lab
+
+Creeping Frost is the central enforcement layer. SafeCell contains execution, HoneyNet/Deception supply decoys, Threat Hunter interprets behavior, Supply Chain Guard verifies artifacts, Node Attestation evaluates remote workers, and Incident Response preserves evidence/recovery state. See [docs/security/README.md](docs/security/README.md).
+
 ## Status
 
 This architecture is a design contract, not a claim that every component is implemented. Changes that alter trust boundaries, planner semantics, or backend contracts should be recorded in [docs/DECISIONS.md](docs/DECISIONS.md).
