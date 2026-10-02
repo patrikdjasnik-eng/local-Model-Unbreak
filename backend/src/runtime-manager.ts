@@ -1,4 +1,4 @@
-import { execFile, spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
+import { execFile, spawn } from "node:child_process";
 import path from "node:path";
 import { promisify } from "node:util";
 import type { CatalogModel } from "./catalog.js";
@@ -43,7 +43,7 @@ async function commandExists(command: string): Promise<string | null> {
 }
 
 export class RuntimeManager {
-  private process: ChildProcessWithoutNullStreams | null = null;
+  private process: ReturnType<typeof spawn> | null = null;
   private state: RuntimeState;
   private readonly fetchImpl: typeof fetch;
   private readonly startupTimeoutMs: number;
@@ -98,7 +98,7 @@ export class RuntimeManager {
     }
   }
 
-  private async waitUntilReady(child: ChildProcessWithoutNullStreams): Promise<void> {
+  private async waitUntilReady(child: ReturnType<typeof spawn>): Promise<void> {
     const started = Date.now();
 
     while (Date.now() - started < this.startupTimeoutMs) {
@@ -158,7 +158,7 @@ export class RuntimeManager {
     });
 
     let recentError = "";
-    child.stderr.on("data", (chunk: Buffer) => {
+    child.stderr?.on("data", (chunk: Buffer) => {
       recentError = (recentError + chunk.toString("utf8")).slice(-8000);
     });
 
