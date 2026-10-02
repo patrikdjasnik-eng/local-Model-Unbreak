@@ -117,6 +117,90 @@ Důvod: model se vejde s bezpečnou rezervou a naměřená síťová režie zůs
 
 Čísla výše jsou pouze ilustrační. Model Unbreak musí naměřené nebo modelované hodnoty jasně označovat a nikdy nevymýšlet benchmark výsledky.
 
+
+## Produktový zážitek
+
+Model Unbreak by měl působit méně jako low-level inference toolkit a více jako hardware-aware řídicí centrum pro lokální AI.
+
+Uživatelské rozhraní má okamžitě odpovědět na čtyři otázky:
+
+1. **Jaký model se snažím spustit?**
+2. **Jaký hardware je právě dostupný?**
+3. **Proč se model nevejde nebo neběží dobře?**
+4. **Jaký je nejlepší praktický execution plan?**
+
+Frontend proto není plánovaný jako dekorativní dashboard. Má být vizuální vysvětlovací vrstvou planneru.
+
+### Směr frontend mockupu
+
+První detailní frontend mockup by měl stát kolem jednoho hlavního workspace místo mnoha oddělených obrazovek.
+
+```text
+┌────────────────────────────────────────────────────────────────────┐
+│ Model Unbreak                                      LOCAL / HYBRID  │
+├──────────────────┬───────────────────────────┬─────────────────────┤
+│ MODEL            │ HARDWARE MAP              │ EXECUTION PLAN      │
+│                  │                           │                     │
+│ Qwen Coder       │ GPU 0  GTX 1070 Ti        │ HYBRID              │
+│ Q4_K_M           │ 8 GB VRAM                 │                     │
+│ 18.6 GB          │ 6.4 GB free               │ GPU      6.0 GB     │
+│ 32k context      │                           │ RAM      8.2 GB     │
+│                  │ RAM 16 GB                 │ Remote   6.0 GB     │
+│                  │ CPU i5                    │                     │
+├──────────────────┴───────────────────────────┴─────────────────────┤
+│ PROČ TENTO PLÁN                                                    │
+│ ✓ vyhne se OOM                                                     │
+│ ✓ ponechá 768 MB VRAM rezervu                                      │
+│ ✓ remote RTT je dost nízké, aby offload dával smysl                │
+│ ! throughput je zatím odhad, ne měření                              │
+├────────────────────────────────────────────────────────────────────┤
+│ [ Inspect ] [ Benchmark ] [ Compare plans ] [ Run selected plan ] │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+UI má skutečné limity hardwaru ukazovat, ne je schovávat. Memory pressure, network cost, estimated vs measured hodnoty a rejected strategies musí být pochopitelné bez otevírání terminálu.
+
+### Hlavní pohledy
+
+První mockup má obsahovat:
+
+- **Model Inspector** — architektura, kvantizace, velikost, context a odhad runtime memory.
+- **Hardware Map** — CPU, RAM, GPU, VRAM, aktuální load a volitelné trusted remote nodes.
+- **Fit Planner** — kandidátní strategie s jasným selected/rejected stavem.
+- **Proč tento plán?** — human-readable reasoning vytvořený z deterministických planner facts.
+- **Benchmark Lab** — opakovatelné prompt/generation throughput, VRAM/RAM usage, RTT a variance.
+- **Runtime Monitor** — aktuální placement, memory pressure, token speed, warnings a failures.
+- **Privacy Mode** — výrazný indikátor, když je remote execution zakázaný.
+
+### UX principy
+
+1. **Žádná falešná jednoduchost.** Schovávat unnecessary backend syntax, ne skutečné hardware limity.
+2. **Measured a estimated hodnoty musí vypadat odlišně.** Uživatel nesmí zaměnit predikci za benchmark.
+3. **Každé odmítnutí potřebuje důvod.** „Nelze spustit“ nestačí.
+4. **Riziková automatizace vyžaduje explicitní souhlas.** Remote execution a budoucí dynamic migration musí být viditelné akce.
+5. **Slabší PC je hlavní use case.** Rozhraní se má navrhovat kolem constrained hardware, ne pouze kolem flagship GPU.
+6. **Terminal detaily zůstávají dostupné.** Advanced user si musí umět zobrazit přesnou vygenerovanou runtime konfiguraci.
+
+## První veřejné demo
+
+První působivé demo má být záměrně jednoduché:
+
+```text
+1. Uživatel vloží GGUF model do Model Unbreak
+2. Hardware se automaticky detekuje
+3. Model se bezpečně nevejde do VRAM
+4. Model Unbreak porovná realistické strategie
+5. UI vysvětlí trade-offs
+6. Uživatel spustí vybraný plán
+7. Skutečné runtime měření se porovná s predikcí
+```
+
+Silné veřejné demo není „podívejte, umí to spustit llama.cpp“. Zajímavá část je:
+
+> **Model Unbreak vysvětlí, proč se model nevejde, najde realistické alternativy a ukáže, proč je jeden execution plan vhodnější pro aktuální počítač.**
+
+To je hlavní produktová hodnota, kterou má frontend komunikovat.
+
 ## Stav projektu
 
 Model Unbreak je nyní ve fázi **návrhu a prototypu**. Dokumentace definuje zamýšlenou architekturu a bezpečnostní hranice ještě před implementací.
