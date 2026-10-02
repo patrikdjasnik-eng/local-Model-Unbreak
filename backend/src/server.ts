@@ -3,6 +3,8 @@ import { loadBackendConfig } from "./config.js";
 import { inspectHardware } from "./hardware.js";
 import { LlamaService } from "./llama.js";
 import { createApiHandler } from "./app.js";
+import { discoverModels } from "./catalog.js";
+import { RuntimeManager } from "./runtime-manager.js";
 
 const MAX_BODY_BYTES = 64 * 1024;
 
@@ -32,7 +34,13 @@ function copyResponse(response: Response, outgoing: ServerResponse): Promise<voi
 export function createBackendServer() {
   const config = loadBackendConfig();
   const llama = new LlamaService(config.llamaUrl, config.requestTimeoutMs);
-  const handleApi = createApiHandler({ llama, inspectHardware });
+  const runtime = new RuntimeManager({
+    host: config.llamaHost,
+    port: config.llamaPort,
+    models: () => discoverModels(),
+    startupTimeoutMs: 45000
+  });
+  const handleApi = createApiHandler({ llama, runtime, inspectHardware });
 
   return createServer(async (incoming, outgoing) => {
     try {
