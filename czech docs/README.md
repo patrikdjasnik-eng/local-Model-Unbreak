@@ -318,6 +318,26 @@ Celý návrh je v [docs/security/README.md](docs/security/README.md).
 
 Detailní mockup kontrakt je v [docs/FRONTEND_UX_SPEC.md](docs/FRONTEND_UX_SPEC.md). Frontend zahrnuje Model Catalog, Planner, Hardware, Benchmarks, Clone Lab, Security Lab, Nodes a Settings s explicit consent a jasným rozlišením measured vs estimated dat.
 
+## Implementace M1
+
+První skutečná local-inspection implementace vzniká ve větvi `feature/m1-local-inspector`.
+
+Ve větvi už je:
+
+- CPU/RAM probe s CPU-only fallbackem,
+- NVIDIA VRAM probe přes `nvidia-smi` bez shell execution,
+- bounded GGUF v2/v3 metadata reader,
+- mapování běžných `general.file_type` kvantizací,
+- KV-cache/runtime/safety memory estimator s explicitní confidence,
+- local planning `FULL_GPU`, `GPU_RAM_OFFLOAD`, `CPU_ONLY` a `UNSUPPORTED`,
+- Creeping Frost gates pro read-only model/hardware inspection,
+- `model-unbreak inspect <model.gguf>` s textovým a `--json` výstupem,
+- synthetic GGUF a hardware/planner unit testy.
+
+Implementace záměrně označuje unknown data místo vymyšlené přesnosti. Remote execution ani automatický download modelů nejsou součástí M1.
+
+Před merge je stále nutná validace: GitHub Actions joby repozitáře aktuálně končí ještě před startem runneru, takže větev zatím nepovažujeme za green.
+
 ## Stav projektu
 
 Model Unbreak je nyní ve fázi **návrhu a prototypu**. Dokumentace definuje zamýšlenou architekturu a bezpečnostní hranice ještě před implementací.
