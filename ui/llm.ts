@@ -7,8 +7,27 @@ interface LlmMessage {
   content: string;
 }
 
+interface CatalogModel {
+  id: string;
+  name: string;
+  sizeGb: number;
+}
+
+interface RuntimeState {
+  status: "stopped" | "starting" | "running" | "error";
+  modelId: string | null;
+  modelName: string | null;
+  profile: "gpu" | "cpu" | null;
+  error: string | null;
+}
+
 interface ModelsResponse {
-  data?: Array<{ id?: unknown }>;
+  data?: Array<{
+    id?: unknown;
+    name?: unknown;
+    sizeGb?: unknown;
+  }>;
+  runtime?: RuntimeState;
 }
 
 interface ChatResponse {
@@ -42,19 +61,45 @@ export function sanitizeHistory(value: unknown, limit = 20): LlmMessage[] {
 export class LocalLlmClient {
   constructor(private readonly baseUrl = "/api") {}
 
-  async listModels(signal?: AbortSignal): Promise<string[]> {
+  async listModels(signal?: AbortSignal): Promise<{ models: CatalogModel[]; runtime: RuntimeState | null }> {
     const response = await fetch(`${this.baseUrl}/models`, {
       method: "GET",
       headers: { Accept: "application/json" },
       ...(signal ? { signal } : {})
     });
 
-    if (!response.ok) throw new Error(`llama.cpp models request failed: ${response.status}`);
+    if (!response.ok) throw new Error(`Model catalog request failed: ${response.status}`);
 
     const payload = await response.json() as ModelsResponse;
-    return (payload.data ?? [])
-      .map((item) => typeof item.id === "string" ? item.id.trim() : "")
-      .filter(Boolean);
+    const models = (payload.data ?? [])
+      .map((item) => ({
+        id: typeof item.id === "string" ? item.id.trim() : "",
+        name: typeof item.name === "string" ? item.name.trim() : "",
+        sizeGb: typeof item.sizeGb === "number" && Number.isFinite(item.sizeGb) ? item.sizeGb : 0
+      }))
+      .filter((item) => item.id.length > 0)
+      .map((item) => ({
+        ...item,
+        name: item.name || item.id
+      }));
+
+    return { models, runtime: payload.runtime ?? null };
+  }
+
+  async activateModel(modelId: string, signal?: AbortSignal): Promise<RuntimeState> {
+    const response = await fetch(`${this.baseUrl}/runtime/activate`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ modelId }),
+      ...(signal ? { signal } : {})
+    });
+
+    const payload = await response.json().catch(() => ({})) as Partial<RuntimeState> & { error?: string };
+    if (!response.ok) throw new Error(payload.error || `Model activation failed: ${response.status}`);
+    return payload as RuntimeState;
   }
 
   async chat(
@@ -124,7 +169,7 @@ if (dashboard) {
       <div>
         <span class="llm-kicker">LOCAL INTELLIGENCE / LLAMA.CPP</span>
         <h2>Model Unbreak AI Console</h2>
-        <p>RabbitHollow chat UX upravené do vizuálního systému Model Unbreak.</p>
+        <p>Vyber lokální GGUF model. Model Unbreak ho sám spustí a připojí k chatu.</p>
       </div>
       <div class="llm-runtime">
         <span class="llm-state" data-llm-state><i></i><strong>CHECKING</strong></span>
@@ -150,7 +195,7 @@ if (dashboard) {
         <div class="llm-runtime-card">
           <span>Endpoint</span>
           <strong>127.0.0.1:8787</strong>
-          <small>Model Unbreak backend → llama.cpp</small>
+          <small>Automatický runtime · bez ručního spouštění modelu</small>
         </div>
         <div class="llm-runtime-card">
           <span>Privacy</span>
@@ -166,7 +211,7 @@ if (dashboard) {
             <div class="llm-orb">MU</div>
             <span>MODEL UNBREAK / LOCAL AI</span>
             <h3>Local model ready for work.</h3>
-            <p>UI komunikuje s lokálním Model Unbreak backendem, který bezpečně proxyuje llama.cpp.</p>
+            <p>Vyber model vlevo a rovnou piš. Backend model automaticky načte, spustí llama-server a při problému zkusí CPU fallback.</p>
             <div class="llm-suggestions">
               <button type="button" data-llm-prompt="Vysvětli mi rozdíl mezi GPU offloadem a čistým CPU inference.">GPU offload vs CPU</button>
               <button type="button" data-llm-prompt="Navrhni bezpečné nastavení context size pro 8B Q4 model na 8 GB VRAM.">8 GB VRAM plan</button>
@@ -251,36 +296,76 @@ if (dashboard) {
 
   async function refreshModels(): Promise<void> {
     if (!modelSelect) return;
-    setRuntimeState("checking", "CHECKING");
+    setRuntimeState("checking", "SCANNING");
     modelSelect.disabled = true;
 
     try {
-      const models = await client.listModels();
+      const { models, runtime } = await client.listModels();
       modelSelect.innerHTML = "";
 
       if (models.length === 0) {
-        modelSelect.innerHTML = '<option value="">No loaded models</option>';
-        setRuntimeState("offline", "NO MODEL");
+        modelSelect.innerHTML = '<option value="">No GGUF models discovered</option>';
+        setRuntimeState("offline", "NO MODELS");
         return;
       }
 
       const remembered = localStorage.getItem(MODEL_KEY);
       for (const model of models) {
         const option = document.createElement("option");
-        option.value = model;
-        option.textContent = model;
+        option.value = model.id;
+        option.textContent = model.sizeGb > 0
+          ? `${model.name} · ${model.sizeGb.toFixed(2)} GB`
+          : model.name;
         modelSelect.append(option);
       }
 
-      if (remembered && models.includes(remembered)) modelSelect.value = remembered;
+      const preferred = runtime?.modelId ?? remembered;
+      if (preferred && models.some((model) => model.id === preferred)) {
+        modelSelect.value = preferred;
+      }
+
       localStorage.setItem(MODEL_KEY, modelSelect.value);
-      setRuntimeState("online", "ONLINE");
-    } catch {
-      modelSelect.innerHTML = '<option value="">llama.cpp offline</option>';
+
+      if (runtime?.status === "running" && runtime.modelId === modelSelect.value) {
+        setRuntimeState("online", runtime.profile === "cpu" ? "ONLINE · CPU" : "ONLINE · GPU");
+      } else {
+        setRuntimeState("offline", "SELECT MODEL");
+      }
+    } catch (error) {
+      modelSelect.innerHTML = '<option value="">Backend unavailable</option>';
       setRuntimeState("offline", "OFFLINE");
+      console.error(error);
     } finally {
       modelSelect.disabled = false;
       syncComposer();
+    }
+  }
+
+  async function activateSelectedModel(): Promise<void> {
+    if (!modelSelect?.value || busy) return;
+
+    busy = true;
+    modelSelect.disabled = true;
+    setRuntimeState("checking", "STARTING");
+    syncComposer();
+
+    try {
+      const runtime = await client.activateModel(modelSelect.value);
+      localStorage.setItem(MODEL_KEY, modelSelect.value);
+      setRuntimeState("online", runtime.profile === "cpu" ? "ONLINE · CPU" : "ONLINE · GPU");
+    } catch (error) {
+      setRuntimeState("offline", "START FAILED");
+      history = [...history, {
+        role: "assistant",
+        content: `Model se nepodařilo automaticky spustit: ${error instanceof Error ? error.message : "Unknown error"}`
+      }].slice(-20);
+      saveHistory(history);
+      renderMessages();
+    } finally {
+      busy = false;
+      modelSelect.disabled = false;
+      syncComposer();
+      input?.focus();
     }
   }
 
@@ -358,6 +443,7 @@ if (dashboard) {
   modelSelect?.addEventListener("change", () => {
     localStorage.setItem(MODEL_KEY, modelSelect.value);
     syncComposer();
+    void activateSelectedModel();
   });
 
   input?.addEventListener("input", syncComposer);
