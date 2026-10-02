@@ -74,6 +74,49 @@ Remote-node tests should simulate:
 
 A planner bug should add a minimized fixture whenever practical. Regression fixtures must not contain private hostnames, user prompts, access tokens, or redistributability-restricted model files.
 
+
+## Model acquisition tests
+
+Acquisition tests should cover:
+
+- exact artifact selection,
+- consent required before transfer,
+- insufficient disk-space preflight,
+- pause/resume/cancel behavior,
+- partial files never promoted as installed,
+- hash mismatch remains blocked/quarantined,
+- unsupported GGUF architecture recovery,
+- runtime-update consent remains separate from model-download consent,
+- license-gated artifact cannot download before acceptance.
+
+## Security Lab tests
+
+Security controls need deterministic fixtures for:
+
+- Creeping Frost `ALLOW / ASK / DENY` and restrictions,
+- SafeCell denied host-path access,
+- network deny/allowlist behavior,
+- synthetic canary events,
+- Threat Hunter correlation,
+- node trust drift/revocation,
+- normalized event schema,
+- incident snapshot references,
+- fail-closed behavior when enforcement is unavailable.
+
+Security tests must distinguish `PASS`, `FAIL`, `WARNING`, `NOT_SUPPORTED`, and `NOT_TESTED`.
+
+## Clone tests
+
+Clone workflow tests cover:
+
+- synthetic-only default,
+- per-job data-source consent,
+- folder scope boundaries,
+- dataset preview/scrubbing path,
+- training cancellation cleanup,
+- teacher/student evaluation reproducibility,
+- remote training blocked without trusted-node approval.
+
 ## Definition of done
 
 A behavioral change is complete when:
