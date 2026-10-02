@@ -92,6 +92,42 @@ Výstupní kritérium: multi-node plan se vybere pouze tehdy, když ho podporuj�
 
 Výstupní kritérium: před prezentací dynamic migration jako production-ready publikovat benchmark evidence.
 
+
+### M0.5 — Product surface a catalog contract
+
+- [x] Definovat kurátorovaný Free/Premium model catalog
+- [x] Definovat exact artifact/source a quantization records
+- [x] Definovat artifact-level acquisition místo full-repo clone jako default
+- [x] Definovat explicit consent, partial/resume, quarantine a integrity flow
+- [x] Definovat detailní frontend mockup contract
+- [ ] Zmrazit machine-readable catalog manifest schema
+
+Exit criterion: frontend a budoucí backend používají stejná model IDs, sources, artifacts a trust states.
+
+### M4.5 — Security Lab foundation
+
+- [x] Definovat Creeping Frost AI Firewall v2 policy model
+- [x] Definovat SafeCell isolation contract
+- [x] Definovat HoneyNet a Deception Mode
+- [x] Definovat Threat Hunting a normalized events
+- [x] Definovat supply-chain security a remote-node attestation
+- [x] Definovat defense validation a incident response
+- [ ] Implementovat platform-specific enforcement backends
+- [ ] Přidat security integration tests a evidence fixtures
+
+Exit criterion: každý security badge v UI odpovídá testovatelnému control s explicit failure behavior.
+
+### M6.5 — Model Clone research
+
+- [x] Definovat Quick / Personal / Deep Clone workflow
+- [x] Definovat data-consent boundary
+- [x] Definovat teacher/student evaluation contract
+- [ ] Prototypovat local synthetic-only Quick Clone
+- [ ] Přidat secret-scrubbing a dataset review
+- [ ] Validovat GGUF/export path pro supported student runtimes
+
+Exit criterion: menší clone lze vytvořit a vyhodnotit reprodukovatelně bez silent reading user dat.
+
 ## Pozdější výzkum
 
 - speculative local/remote decoding,
