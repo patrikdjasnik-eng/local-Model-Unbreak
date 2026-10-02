@@ -120,3 +120,35 @@ Update this document before merging features that add:
 - credential storage changes,
 - automatic execution of downloaded artifacts,
 - new network-facing endpoints.
+
+## Extended threats
+
+### Model/runtime supply chain
+
+Threats include artifact substitution, mutable upstream references, malformed GGUF metadata, compromised runtime binaries, license-state confusion, and incomplete downloads promoted as valid artifacts.
+
+Mitigations: exact artifact records, revision pinning for catalog releases, local hashing, quarantine, bounded parsing, SafeCell smoke tests, and Creeping Frost promotion policy.
+
+### Clone-data exposure
+
+Threats include accidental inclusion of secrets, folders broader than intended, silent conversation reuse, or remote training on an untrusted node.
+
+Mitigations: synthetic-only default, explicit data-source scope, preview/scrubbing, local-first training, attested nodes, and visible transfer consent.
+
+### Deception misuse
+
+Threat: real credentials or production systems accidentally used as decoys.
+
+Mitigation: synthetic non-privileged canaries only; no retaliation or external targeting.
+
+### Policy bypass
+
+Threat: component launches a runtime or network operation without Creeping Frost evaluation.
+
+Mitigation: central capability contract, integration tests, fail-closed enforcement, and event auditing.
+
+### Attestation drift
+
+Threat: a previously trusted node changes worker/runtime/security state.
+
+Mitigation: attestation snapshots, hash/version comparison, automatic trust downgrade to `OBSERVED`, and fresh user approval where policy requires it.
