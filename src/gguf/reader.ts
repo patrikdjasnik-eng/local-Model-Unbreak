@@ -90,6 +90,10 @@ class BinaryReader {
     return buffer;
   }
 
+  async ascii(length: number): Promise<string> {
+    return (await this.readExact(length)).toString("ascii");
+  }
+
   async skip(length: number): Promise<void> {
     if (!Number.isSafeInteger(length) || length < 0 || this.position + length > this.fileSize) {
       throw new Error("GGUF skip exceeds file bounds.");
@@ -233,13 +237,10 @@ export async function inspectGguf(filePath: string): Promise<GgufModelProfile> {
     if (stat.size < 24) throw new Error("GGUF file is too small.");
 
     const reader = new BinaryReader(file, stat.size);
-    const magic = (await file.read(Buffer.alloc(4), 0, 4, 0)).buffer;
-    const magicBuffer = Buffer.from(magic);
-    if (magicBuffer.subarray(0, 4).toString("ascii") !== GGUF_MAGIC) {
+    if (await reader.ascii(4) !== GGUF_MAGIC) {
       throw new Error("Invalid GGUF magic.");
     }
 
-    await reader.skip(4);
     const version = await reader.uint32();
     if (!SUPPORTED_VERSIONS.has(version)) {
       throw new Error(`Unsupported GGUF version: ${version}`);
@@ -262,11 +263,18 @@ export async function inspectGguf(filePath: string): Promise<GgufModelProfile> {
     const name = asString(metadata["general.name"]);
     const fileType = asNumber(metadata["general.file_type"]);
     const alignment = asNumber(metadata["general.alignment"]) ?? DEFAULT_ALIGNMENT;
+    const contextLength = metadataNumber(metadata, architecture, "context_length");
+    const embeddingLength = metadataNumber(metadata, architecture, "embedding_length");
+    const blockCount = metadataNumber(metadata, architecture, "block_count");
+    const attentionHeadCount = metadataNumber(metadata, architecture, "attention.head_count");
+    const attentionHeadCountKv = metadataNumber(metadata, architecture, "attention.head_count_kv");
     const warnings: string[] = [];
     const quantization = quantizationFromFileType(fileType);
 
     if (!architecture) warnings.push("GGUF architecture metadata is missing.");
-    if (quantization === "UNKNOWN") warnings.push("GGUF quantization could not be identified from general.file_type.");
+    if (quantization === "UNKNOWN") {
+      warnings.push("GGUF quantization could not be identified from general.file_type.");
+    }
 
     return {
       format: "GGUF",
@@ -278,11 +286,11 @@ export async function inspectGguf(filePath: string): Promise<GgufModelProfile> {
       fileSizeBytes: stat.size,
       tensorCount,
       metadataCount,
-      contextLength: metadataNumber(metadata, architecture, "context_length"),
-      embeddingLength: metadataNumber(metadata, architecture, "embedding_length"),
-      blockCount: metadataNumber(metadata, architecture, "block_count"),
-      attentionHeadCount: metadataNumber(metadata, architecture, "attention.head_count"),
-      attentionHeadCountKv: metadataNumber(metadata, architecture, "attention.head_count_kv"),
+      ...(contextLength !== undefined ? { contextLength } : {}),
+      ...(embeddingLength !== undefined ? { embeddingLength } : {}),
+      ...(blockCount !== undefined ? { blockCount } : {}),
+      ...(attentionHeadCount !== undefined ? { attentionHeadCount } : {}),
+      ...(attentionHeadCountKv !== undefined ? { attentionHeadCountKv } : {}),
       alignment,
       metadata,
       warnings

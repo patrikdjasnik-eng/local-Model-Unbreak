@@ -78,9 +78,8 @@ describe("memory estimator and fit planner", () => {
   });
 
   it("marks a plan conditional when KV metadata is insufficient", () => {
-    const profile = model({
-      attentionHeadCountKv: undefined
-    });
+    const profile = model();
+    delete profile.attentionHeadCountKv;
     const memory = estimateMemory(profile);
     const plan = planFit(profile, hardware(16 * gib, 10 * gib), memory);
 

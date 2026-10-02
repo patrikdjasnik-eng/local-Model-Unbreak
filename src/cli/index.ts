@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { pathToFileURL } from "node:url";
 import { inspectModel, renderInspectionJson, renderInspectionText } from "./inspect.js";
 
 interface CliOptions {
@@ -40,7 +41,7 @@ export function parseCliArgs(argv: readonly string[]): CliOptions {
       index += 1;
       continue;
     }
-    throw new Error(`Unknown argument: ${arg}`);
+    throw new Error(`Unknown argument: ${String(arg)}`);
   }
 
   return {
@@ -51,9 +52,9 @@ export function parseCliArgs(argv: readonly string[]): CliOptions {
   };
 }
 
-async function main(): Promise<void> {
+export async function runCli(argv: readonly string[]): Promise<number> {
   try {
-    const options = parseCliArgs(process.argv.slice(2));
+    const options = parseCliArgs(argv);
     const result = await inspectModel(options.modelPath, {
       ...(options.contextTokens !== undefined ? { contextTokens: options.contextTokens } : {})
     });
@@ -62,14 +63,16 @@ async function main(): Promise<void> {
         ? `${renderInspectionJson(result)}\n`
         : `${renderInspectionText(result)}\n`
     );
+    return 0;
   } catch (error) {
     process.stderr.write(
       `Model Unbreak error: ${error instanceof Error ? error.message : "unknown error"}\n`
     );
-    process.exitCode = 1;
+    return 1;
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]?.replaceAll("\\", "/")}`) {
-  await main();
+const entryPath = process.argv[1];
+if (entryPath && import.meta.url === pathToFileURL(entryPath).href) {
+  process.exitCode = await runCli(process.argv.slice(2));
 }

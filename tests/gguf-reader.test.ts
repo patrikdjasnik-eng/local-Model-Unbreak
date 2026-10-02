@@ -77,7 +77,9 @@ describe("GGUF reader", () => {
   });
 
   it("rejects invalid magic", async () => {
-    const filePath = await tempFile(Buffer.from("NOPE-not-a-gguf"));
+    const content = Buffer.alloc(24);
+    content.write("NOPE", 0, "ascii");
+    const filePath = await tempFile(content);
     await expect(inspectGguf(filePath)).rejects.toThrow("magic");
   });
 
