@@ -5,3 +5,4 @@ export * from "./sandbox/index.js";
 export * from "./security/events/index.js";
 export * from "./security/network/index.js";
 export * from "./security/policy/index.js";
+export * from "./security/threat-hunting/index.js";
