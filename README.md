@@ -201,6 +201,125 @@ A strong public demo is not “look, it can launch llama.cpp.” The interesting
 
 That is the core product value the frontend should communicate.
 
+
+## Built-in model catalog
+
+Model Unbreak is planned to ship with a curated catalog while still allowing **any user-provided GGUF supported by the active runtime**. Free users are not blocked from importing a large local GGUF. Premium represents Model Unbreak orchestration and optimization features, not ownership of upstream open models.
+
+### Free
+
+| Model | Quant | Source | Primary use |
+| --- | --- | --- | --- |
+| Qwen3.5 0.8B | Q8_0 | `ggml-org/Qwen3.5-0.8B-GGUF` | lightweight general |
+| Qwen3 1.7B | Q4_K_M | `ggml-org/Qwen3-1.7B-GGUF` | general / reasoning |
+| SmolLM3 3B | Q4_K_M | `ggml-org/SmolLM3-3B-GGUF` | lightweight multilingual chat |
+| Qwen3 4B | Q4_K_M | `ggml-org/Qwen3-4B-GGUF` | stronger general / reasoning |
+| Qwen2.5-Coder 1.5B Instruct | Q4_K_M | `tensorblock/Qwen2.5-Coder-1.5B-Instruct-GGUF` | lightweight coding |
+
+### Premium-curated
+
+| Model | Quant | Source | Primary use |
+| --- | --- | --- | --- |
+| Qwen3 8B | Q4_K_M | `Qwen/Qwen3-8B-GGUF` | stronger general / reasoning |
+| Qwen2.5-Coder 7B Instruct | Q8_0 | `ggml-org/Qwen2.5-Coder-7B-Instruct-Q8_0-GGUF` | coding |
+| gpt-oss 20B | MXFP4 | `ggml-org/gpt-oss-20b-GGUF` | large general / reasoning |
+| Gemma 3 12B IT | Q4_K_M | `ggml-org/gemma-3-12b-it-GGUF` | multimodal / general |
+| Gemma 3 27B IT | Q4_K_M | `ggml-org/gemma-3-27b-it-GGUF` | large multimodal / general |
+
+Exact filenames, sizes, license handling, source URIs, and acquisition rules are defined in [docs/MODEL_CATALOG.md](docs/MODEL_CATALOG.md).
+
+### Download without model-repository complexity
+
+The user should not need to understand Git LFS, Xet, repository layouts, or quantization filenames.
+
+The default flow is:
+
+```text
+choose task/model
+      ↓
+hardware fit
+      ↓
+exact artifact + license
+      ↓
+explicit user approval
+      ↓
+artifact-level download
+      ↓
+integrity check
+      ↓
+quarantine
+      ↓
+GGUF/runtime compatibility
+      ↓
+trusted local model store
+```
+
+Model Unbreak prefers exact Hugging Face artifact retrieval through `huggingface_hub` instead of cloning an entire model repository. Git/Git LFS is a fallback when artifact-level retrieval is unavailable.
+
+Downloads support a staging/partial state so pause, resume, cancel, retry, and cleanup can be implemented without treating incomplete files as installed models. See [docs/MODEL_ACQUISITION.md](docs/MODEL_ACQUISITION.md).
+
+## Model Clone
+
+A future **Model Clone / Self-Distill** workflow can use a larger teacher to create a smaller specialized student or adapter.
+
+```text
+large teacher
+     ↓
+synthetic or explicitly selected data
+     ↓
+LoRA / QLoRA / distillation
+     ↓
+evaluation
+     ↓
+smaller local clone
+```
+
+Personal conversations, coding sessions, folders, or datasets are never selected silently. The default clone data source is synthetic-only. See [docs/MODEL_CLONING.md](docs/MODEL_CLONING.md).
+
+## Security Lab
+
+Security is designed as a visible product surface rather than a hidden checkbox.
+
+The planned Security Lab combines:
+
+- **Creeping Frost AI Firewall v2** — central `ALLOW / ASK / DENY` capability policy and enforcement,
+- **SafeCell** — disposable runtime isolation and virtual/fake-storage boundary,
+- **HoneyNet** — isolated decoy services and canary resources,
+- **Threat Hunting** — behavioral baselines, rules, and event correlation,
+- **Defense Validation** — non-destructive verification of controls on owned/authorized systems,
+- **Supply Chain Guard** — source, revision, license, hash, quarantine, and promotion policy,
+- **Node Attestation** — trust evidence for remote GPU workers,
+- **Deception Mode** — fake credentials/files/services that expose unexpected runtime behavior,
+- **Incident Response** — containment, evidence, recovery, and incident timeline.
+
+```text
+Model source
+     ↓
+Supply Chain Guard
+     ↓
+Quarantine
+     ↓
+SafeCell
+     ↓
+Creeping Frost
+     ↓
+Runtime / Remote Node
+     ↓
+Threat Hunter + HoneyNet
+     ↓
+Incident Engine
+```
+
+Security modes are planned as `STANDARD`, `PRIVATE`, `HARDENED`, `DECEPTION`, and `AIRGAP`.
+
+Creeping Frost is capability-aware: it can govern network, filesystem, processes, model acquisition, RAM/VRAM allocation, remote compute, clone training, and security actions. Threat signals may automatically **tighten** a pre-authorized policy, but never silently weaken it.
+
+The full security design starts at [docs/security/README.md](docs/security/README.md).
+
+## Frontend specification
+
+The detailed mockup contract is documented in [docs/FRONTEND_UX_SPEC.md](docs/FRONTEND_UX_SPEC.md). The frontend includes Model Catalog, Planner, Hardware, Benchmarks, Clone Lab, Security Lab, Nodes, and Settings, with explicit consent and clear measured-vs-estimated states.
+
 ## Project status
 
 Model Unbreak is currently in the **design and prototype stage**. The documentation defines the intended architecture and safety boundaries before implementation starts.
