@@ -117,6 +117,90 @@ Reason: model fits with safe headroom and measured network overhead remains belo
 
 Numbers above are illustrative only. Model Unbreak should report measured or modelled values clearly, never fabricate benchmark results.
 
+
+## Product experience
+
+Model Unbreak should feel less like a low-level inference toolkit and more like a hardware-aware control center for local AI.
+
+The user experience should answer four questions immediately:
+
+1. **What model am I trying to run?**
+2. **What hardware is available right now?**
+3. **Why does the model not fit or perform well?**
+4. **What is the best practical execution plan?**
+
+The frontend is therefore not planned as a decorative dashboard. It is a visual explanation layer for the planner.
+
+### Frontend mockup direction
+
+The first detailed frontend mockup should revolve around one main workspace rather than many disconnected screens.
+
+```text
+┌────────────────────────────────────────────────────────────────────┐
+│ Model Unbreak                                      LOCAL / HYBRID  │
+├──────────────────┬───────────────────────────┬─────────────────────┤
+│ MODEL            │ HARDWARE MAP              │ EXECUTION PLAN      │
+│                  │                           │                     │
+│ Qwen Coder       │ GPU 0  GTX 1070 Ti        │ HYBRID              │
+│ Q4_K_M           │ 8 GB VRAM                 │                     │
+│ 18.6 GB          │ 6.4 GB free               │ GPU      6.0 GB     │
+│ 32k context      │                           │ RAM      8.2 GB     │
+│                  │ RAM 16 GB                 │ Remote   6.0 GB     │
+│                  │ CPU i5                    │                     │
+├──────────────────┴───────────────────────────┴─────────────────────┤
+│ WHY THIS PLAN                                                      │
+│ ✓ avoids OOM                                                       │
+│ ✓ keeps 768 MB VRAM headroom                                       │
+│ ✓ remote RTT is low enough to justify offload                      │
+│ ! estimated throughput, not yet measured                           │
+├────────────────────────────────────────────────────────────────────┤
+│ [ Inspect ] [ Benchmark ] [ Compare plans ] [ Run selected plan ] │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+The UI should make local constraints visible instead of hiding them. Memory pressure, network cost, estimated versus measured values, and rejected strategies should be understandable without opening a terminal.
+
+### Primary views
+
+The first mockup should include:
+
+- **Model Inspector** — architecture, quantization, file size, context, estimated runtime memory.
+- **Hardware Map** — CPU, RAM, GPU, VRAM, current load, and optional trusted remote nodes.
+- **Fit Planner** — candidate strategies with clear selected/rejected states.
+- **Why this plan?** — human-readable reasoning generated from deterministic planner facts.
+- **Benchmark Lab** — repeatable prompt/generation throughput, VRAM/RAM usage, RTT, and variance.
+- **Runtime Monitor** — current placement, memory pressure, token speed, warnings, and failures.
+- **Privacy Mode** — an obvious indicator when remote execution is forbidden.
+
+### UX principles
+
+1. **No fake simplicity.** Hide unnecessary backend syntax, not real hardware limits.
+2. **Measured and estimated values must look different.** The user should never confuse a prediction with a benchmark.
+3. **Every rejection needs a reason.** “Cannot run” is not enough.
+4. **Dangerous automation requires explicit consent.** Remote execution and future dynamic migration must be visible actions.
+5. **The weak-PC case is the hero case.** The interface should be designed around constrained hardware, not only flagship GPUs.
+6. **Terminal details remain available.** Advanced users should be able to inspect the exact generated runtime configuration.
+
+## First public demo
+
+The first compelling demo should be intentionally simple:
+
+```text
+1. Drop a GGUF model into Model Unbreak
+2. Hardware is detected automatically
+3. The model does not safely fit in VRAM
+4. Model Unbreak compares realistic strategies
+5. The UI explains the trade-offs
+6. The user launches the selected plan
+7. Actual runtime measurements are compared with the prediction
+```
+
+A strong public demo is not “look, it can launch llama.cpp.” The interesting part is:
+
+> **Model Unbreak explains why the model does not fit, finds realistic alternatives, and shows why one execution plan is better suited to the current machine.**
+
+That is the core product value the frontend should communicate.
+
 ## Project status
 
 Model Unbreak is currently in the **design and prototype stage**. The documentation defines the intended architecture and safety boundaries before implementation starts.
