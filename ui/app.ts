@@ -1,4 +1,5 @@
 import "./styles.css";
+import "./llm.js";
 
 type IconName =
   | "dashboard"
@@ -60,6 +61,7 @@ const navItems: NavItem[] = [
   { label: "Security Lab", icon: "shield" },
   { label: "Nodes", icon: "nodes" },
   { label: "Catalog", icon: "catalog" },
+  { label: "Local AI", icon: "bolt" },
   { label: "Settings", icon: "settings" }
 ];
 
@@ -461,9 +463,17 @@ document.querySelectorAll<HTMLButtonElement>("[data-nav]").forEach((button) => {
 
     const destination = button.dataset.nav ?? "Dashboard";
     if (destination === "Dashboard") {
-      showToast("Dashboard is already active.");
+      document.dispatchEvent(new CustomEvent("model-unbreak:navigate", { detail: { view: "dashboard" } }));
+      showToast("Dashboard is active.");
       return;
     }
+
+    if (destination === "Local AI") {
+      document.dispatchEvent(new CustomEvent("model-unbreak:navigate", { detail: { view: "local-ai" } }));
+      return;
+    }
+
+    document.dispatchEvent(new CustomEvent("model-unbreak:navigate", { detail: { view: "dashboard" } }));
 
     openModal(
       destination,
