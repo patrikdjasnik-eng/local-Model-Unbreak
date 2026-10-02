@@ -1,5 +1,4 @@
 import "./styles.css";
-import "./llm.js";
 
 type IconName =
   | "dashboard"
@@ -425,6 +424,8 @@ app.innerHTML = `
     </div>
   </main>
 `;
+
+await import("./llm.js");
 
 const toastStack = document.querySelector<HTMLDivElement>(".toast-stack");
 const modal = document.querySelector<HTMLDivElement>("[data-modal]");
