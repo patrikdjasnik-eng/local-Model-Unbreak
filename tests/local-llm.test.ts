@@ -61,3 +61,15 @@ describe("sanitizeHistory", () => {
     ]);
   });
 });
+
+
+describe("local-only proxy configuration", () => {
+  it("keeps the demo proxy local-only", async () => {
+    const { readFile } = await import("node:fs/promises");
+    const config = await readFile("vite.config.ts", "utf8");
+
+    expect(config).toContain("127.0.0.1");
+    expect(config).toContain("localhost");
+    expect(config).toContain("VITE_LLAMA_URL must point to localhost/loopback");
+  });
+});
