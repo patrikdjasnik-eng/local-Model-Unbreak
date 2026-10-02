@@ -20,6 +20,56 @@ function createDeps() {
       listModels: vi.fn(async () => ["qwen"]),
       chat: vi.fn(async () => "backend answer")
     },
+    runtime: {
+      getState: vi.fn(() => ({
+        status: "running",
+        managed: true,
+        modelId: "qwen",
+        modelName: "qwen.gguf",
+        pid: 123,
+        endpoint: "http://127.0.0.1:8081",
+        profile: "gpu",
+        error: null
+      })),
+      getCatalog: vi.fn(async () => [{
+        id: "qwen",
+        name: "qwen.gguf",
+        path: "C:\\models\\qwen.gguf",
+        sizeBytes: 4_000_000_000,
+        sizeGb: 3.73,
+        source: "discovered" as const
+      }]),
+      activate: vi.fn(async () => ({
+        status: "running" as const,
+        managed: true,
+        modelId: "qwen",
+        modelName: "qwen.gguf",
+        pid: 123,
+        endpoint: "http://127.0.0.1:8081",
+        profile: "gpu" as const,
+        error: null
+      })),
+      ensureActive: vi.fn(async () => ({
+        status: "running" as const,
+        managed: true,
+        modelId: "qwen",
+        modelName: "qwen.gguf",
+        pid: 123,
+        endpoint: "http://127.0.0.1:8081",
+        profile: "gpu" as const,
+        error: null
+      })),
+      stop: vi.fn(async () => ({
+        status: "stopped" as const,
+        managed: false,
+        modelId: null,
+        modelName: null,
+        pid: null,
+        endpoint: "http://127.0.0.1:8081",
+        profile: null,
+        error: null
+      }))
+    },
     inspectHardware: vi.fn(async () => hardware),
     now: vi.fn(() => 1000)
   };
@@ -30,7 +80,7 @@ describe("backend config", () => {
     const config = loadBackendConfig({});
     expect(config.host).toBe("127.0.0.1");
     expect(config.port).toBe(8787);
-    expect(config.llamaUrl).toBe("http://127.0.0.1:8080");
+    expect(config.llamaUrl).toBe("http://127.0.0.1:8081");
   });
 
   it("rejects non-local llama URLs", () => {
@@ -100,7 +150,31 @@ describe("backend API", () => {
     const payload = await response.json();
 
     expect(response.status).toBe(200);
-    expect(payload.data).toEqual([{ id: "qwen", object: "model", owned_by: "local" }]);
+    expect(payload.data).toEqual([{ id: "qwen", object: "model", owned_by: "local", name: "qwen.gguf", sizeGb: 3.73 }]);
+  });
+
+  it("activates a discovered model from the catalog", async () => {
+    const deps = createDeps();
+    const handler = createApiHandler(deps);
+    const response = await handler(new Request("http://127.0.0.1/api/runtime/activate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ modelId: "qwen" })
+    }));
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(payload.status).toBe("running");
+    expect(deps.runtime.activate).toHaveBeenCalledWith("qwen");
+  });
+
+  it("returns the discovered model catalog", async () => {
+    const handler = createApiHandler(createDeps());
+    const response = await handler(new Request("http://127.0.0.1/api/catalog"));
+    const payload = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(payload.data[0]).toMatchObject({ id: "qwen", name: "qwen.gguf", sizeGb: 3.73 });
   });
 
   it("validates chat input before contacting llama.cpp", async () => {
@@ -136,8 +210,9 @@ describe("backend API", () => {
 
     expect(response.status).toBe(200);
     expect(payload.choices[0].message.content).toBe("backend answer");
+    expect(deps.runtime.ensureActive).toHaveBeenCalledWith("qwen");
     expect(deps.llama.chat).toHaveBeenCalledWith(
-      "qwen",
+      "qwen.gguf",
       [{ role: "user", content: "hello" }],
       { temperature: 2, maxTokens: 64 }
     );
