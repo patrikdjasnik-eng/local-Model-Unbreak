@@ -1,9 +1,12 @@
 import type { HardwareSnapshot } from "./hardware.js";
 import type { LlamaService, ChatMessage } from "./llama.js";
+import type { RuntimeManager, RuntimeState } from "./runtime-manager.js";
+import type { CatalogModel } from "./catalog.js";
 import { createExecutionPlan } from "./planner.js";
 
 export interface BackendDependencies {
   llama: Pick<LlamaService, "health" | "listModels" | "chat">;
+  runtime: Pick<RuntimeManager, "getState" | "getCatalog" | "activate" | "ensureActive" | "stop">;
   inspectHardware: () => Promise<HardwareSnapshot>;
   now?: () => number;
 }
@@ -13,6 +16,10 @@ interface ChatBody {
   messages?: unknown;
   temperature?: unknown;
   maxTokens?: unknown;
+}
+
+interface ActivateBody {
+  modelId?: unknown;
 }
 
 interface PlanBody {
@@ -78,12 +85,47 @@ export function createApiHandler(deps: BackendDependencies): (request: Request) 
         ok: true,
         service: "model-unbreak-backend",
         localOnly: true,
+        runtime: deps.runtime.getState(),
         llama: {
           reachable: llama.reachable,
           modelCount: llama.models.length,
           models: llama.models
         }
       });
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/catalog") {
+      try {
+        const models = await deps.runtime.getCatalog();
+        return json({
+          data: models,
+          runtime: deps.runtime.getState()
+        });
+      } catch (error) {
+        return json({
+          error: error instanceof Error ? error.message : "Local model catalog failed."
+        }, 500);
+      }
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/runtime/activate") {
+      const body = await safeBody<ActivateBody>(request);
+      const modelId = typeof body?.modelId === "string" ? body.modelId.trim() : "";
+      if (!modelId) return json({ error: "modelId is required" }, 400);
+
+      try {
+        const runtime = await deps.runtime.activate(modelId);
+        return json(runtime);
+      } catch (error) {
+        return json({
+          error: error instanceof Error ? error.message : "Model activation failed.",
+          runtime: deps.runtime.getState()
+        }, 500);
+      }
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/runtime/stop") {
+      return json(await deps.runtime.stop());
     }
 
     if (request.method === "GET" && url.pathname === "/api/hardware") {
@@ -98,15 +140,22 @@ export function createApiHandler(deps: BackendDependencies): (request: Request) 
 
     if (request.method === "GET" && url.pathname === "/api/models") {
       try {
-        const models = await deps.llama.listModels();
+        const models = await deps.runtime.getCatalog();
         return json({
           object: "list",
-          data: models.map((id) => ({ id, object: "model", owned_by: "local" }))
+          data: models.map((model) => ({
+            id: model.id,
+            object: "model",
+            owned_by: "local",
+            name: model.name,
+            sizeGb: model.sizeGb
+          })),
+          runtime: deps.runtime.getState()
         });
       } catch (error) {
         return json({
           error: error instanceof Error ? error.message : "Local model discovery failed."
-        }, 502);
+        }, 500);
       }
     }
 
@@ -122,11 +171,14 @@ export function createApiHandler(deps: BackendDependencies): (request: Request) 
       const maxTokens = Math.round(clampNumber(body?.maxTokens, 1024, 64, 8192));
 
       try {
-        const content = await deps.llama.chat(model, messages, { temperature, maxTokens });
+        const runtime = await deps.runtime.ensureActive(model);
+        const runtimeModel = runtime.modelName ?? model;
+        const content = await deps.llama.chat(runtimeModel, messages, { temperature, maxTokens });
         return json({
           id: `local-${now()}`,
           object: "chat.completion",
-          model,
+          model: runtimeModel,
+          runtime,
           choices: [{
             index: 0,
             finish_reason: "stop",
