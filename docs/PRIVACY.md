@@ -50,3 +50,29 @@ Diagnostic bundles should be sanitized by construction. Where identifiers are ne
 ## Future services
 
 If the project later introduces optional hosted services, public relays, or cloud coordination, those features require a separate privacy review and explicit opt-in.
+
+## Model acquisition privacy
+
+Catalog browsing may require network access to upstream registries. Model download consent must show the selected upstream provider and artifact.
+
+Inference permissions are separate from download permissions: allowing a download from a registry does not grant the model runtime general internet access.
+
+## Model Clone privacy
+
+Clone jobs default to synthetic-only data.
+
+The following require explicit selection:
+
+- conversations,
+- coding sessions,
+- local folders,
+- custom datasets,
+- remote training.
+
+The user should be able to review included records and detected secrets before training begins.
+
+## Security telemetry privacy
+
+Security Lab stores behavioral metadata locally by default. Canary IDs, event types, policy results, hashes, and resource classes are preferred over raw personal content.
+
+Deception assets are synthetic. Real credentials must never be copied into HoneyNet to make decoys look realistic.
