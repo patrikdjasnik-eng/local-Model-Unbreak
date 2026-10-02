@@ -15,7 +15,10 @@ export function createDefaultCreepingFrostEngine(): CreepingFrostEngine {
         "catalog.read",
         "model.read",
         "runtime.inspect",
-        "security.observe"
+        "security.observe",
+        "filesystem.model.read",
+        "model.inspect",
+        "hardware.inspect"
       ]),
       maxRiskLevel: "MEDIUM"
     }),
