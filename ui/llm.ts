@@ -40,10 +40,10 @@ export function sanitizeHistory(value: unknown, limit = 20): LlmMessage[] {
 }
 
 export class LocalLlmClient {
-  constructor(private readonly baseUrl = "/llama") {}
+  constructor(private readonly baseUrl = "/api") {}
 
   async listModels(signal?: AbortSignal): Promise<string[]> {
-    const response = await fetch(`${this.baseUrl}/v1/models`, {
+    const response = await fetch(`${this.baseUrl}/models`, {
       method: "GET",
       headers: { Accept: "application/json" },
       ...(signal ? { signal } : {})
@@ -65,7 +65,7 @@ export class LocalLlmClient {
     const cleanModel = model.trim();
     if (!cleanModel) throw new Error("No local model is selected.");
 
-    const response = await fetch(`${this.baseUrl}/v1/chat/completions`, {
+    const response = await fetch(`${this.baseUrl}/chat`, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -149,8 +149,8 @@ if (dashboard) {
         </label>
         <div class="llm-runtime-card">
           <span>Endpoint</span>
-          <strong>127.0.0.1:8080</strong>
-          <small>Vite proxy → llama.cpp OpenAI API</small>
+          <strong>127.0.0.1:8787</strong>
+          <small>Model Unbreak backend → llama.cpp</small>
         </div>
         <div class="llm-runtime-card">
           <span>Privacy</span>
@@ -166,7 +166,7 @@ if (dashboard) {
             <div class="llm-orb">MU</div>
             <span>MODEL UNBREAK / LOCAL AI</span>
             <h3>Local model ready for work.</h3>
-            <p>Po připojení k llama.cpp posílá konzole skutečné OpenAI-compatible requesty na lokální model.</p>
+            <p>UI komunikuje s lokálním Model Unbreak backendem, který bezpečně proxyuje llama.cpp.</p>
             <div class="llm-suggestions">
               <button type="button" data-llm-prompt="Vysvětli mi rozdíl mezi GPU offloadem a čistým CPU inference.">GPU offload vs CPU</button>
               <button type="button" data-llm-prompt="Navrhni bezpečné nastavení context size pro 8B Q4 model na 8 GB VRAM.">8 GB VRAM plan</button>
