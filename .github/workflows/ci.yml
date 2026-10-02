@@ -28,3 +28,6 @@ jobs:
 
       - name: Tests
         run: npm test
+
+      - name: Build UI
+        run: npm run build:ui

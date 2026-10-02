@@ -499,8 +499,9 @@ document.querySelectorAll<HTMLButtonElement>("[data-action]").forEach((button) =
       return;
     }
 
-    if (action && actions[action]) {
-      openModal(actions[action][0], actions[action][1]);
+    const actionConfig = action ? actions[action] : undefined;
+    if (actionConfig) {
+      openModal(actionConfig[0], actionConfig[1]);
     }
   });
 });
@@ -517,7 +518,10 @@ document.querySelectorAll<HTMLButtonElement>("[data-switch]").forEach((toggle) =
 document.querySelectorAll<HTMLButtonElement>("[data-permission]").forEach((permission) => {
   permission.addEventListener("click", () => {
     const deny = permission.classList.toggle("deny");
-    permission.childNodes[0].textContent = deny ? "DENY " : "ALLOW ";
+    const labelNode = permission.firstChild;
+    if (labelNode) {
+      labelNode.textContent = deny ? "DENY " : "ALLOW ";
+    }
     showToast(`Policy changed to ${deny ? "DENY" : "ALLOW"}.`, "success");
   });
 });
