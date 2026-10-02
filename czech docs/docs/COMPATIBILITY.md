@@ -61,3 +61,29 @@ Tento dokument odděluje planned support od verified support. Dokud neexistuje i
 ## Compatibility rule
 
 Zařízení, backend ani platforma nejsou označeny jako `Verified` jen proto, že upstream software tvrdí podporu. Model Unbreak verification vyžaduje úspěšný planner behavior, launch, inference, metrics collection a failure cleanup pod dokumentovanou konfigurací.
+
+## GGUF compatibility policy
+
+Model Unbreak nemá tvrdit podporu „každého GGUF, který kdy vznikl“. GGUF je container format; active runtime musí znát model architecture a required tensor/runtime features.
+
+Compatibility se vyhodnocuje po vrstvách:
+
+```text
+GGUF container readable?
+      ↓
+architecture known to runtime?
+      ↓
+required backend capability available?
+      ↓
+Model Unbreak policy/test status?
+      ↓
+SUPPORTED / EXPERIMENTAL / VERIFIED / UNSUPPORTED
+```
+
+User může importovat libovolný GGUF. Pokud active runtime architecture neumí, Model Unbreak může nabídnout samostatně consented runtime update, pokud approved newer runtime support má.
+
+## Curated catalog compatibility
+
+Built-in model menu je v [MODEL_CATALOG.md](MODEL_CATALOG.md). Catalog entry ukládá exact source, artifact, quantization a license. Přítomnost v catalogu neznamená, že model poběží na každém hardware.
+
+Free/Premium je product-feature boundary, ne file-format compatibility boundary.
