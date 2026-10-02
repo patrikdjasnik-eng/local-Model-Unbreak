@@ -51,3 +51,27 @@ It can be made safer, but it changes the trust boundary. Early designs assume ex
 ## Where should I start contributing?
 
 Read [../CONTRIBUTING.md](../CONTRIBUTING.md), then look for a small measurable problem: GGUF metadata parsing, memory estimation fixtures, planner edge cases, benchmark reproducibility, or security review.
+
+## Can I use my own GGUF on Free?
+
+Yes. The planned tier model allows user-provided GGUF files when the active runtime supports the architecture. Premium is for Model Unbreak orchestration/optimization features, not for locking users out of open model files.
+
+## Does Model Unbreak clone whole model repositories?
+
+Not by default. The catalog resolves the exact selected artifact and prefers artifact-level download through the provider API. Full Git/Git LFS clone is a fallback only when necessary and explicitly approved.
+
+## Which models are in the initial menu?
+
+The initial catalog includes lightweight Free entries such as Qwen3.5 0.8B, Qwen3 1.7B/4B, SmolLM3 3B, and Qwen2.5-Coder 1.5B, plus stronger premium-curated entries such as Qwen3 8B, Qwen2.5-Coder 7B, gpt-oss 20B, and Gemma 3 12B/27B. Exact sources/quantizations are in [MODEL_CATALOG.md](MODEL_CATALOG.md).
+
+## What is Model Clone?
+
+A research workflow that uses a larger teacher plus synthetic or explicitly selected user data to create/evaluate a smaller specialized student or adapter. It is not a perfect copy of the teacher. See [MODEL_CLONING.md](MODEL_CLONING.md).
+
+## What is Creeping Frost?
+
+Creeping Frost AI Firewall v2 is the planned central capability policy engine. It evaluates requests such as network access, host filesystem access, process spawning, remote compute, VRAM/RAM allocation, model acquisition, and clone training using `ALLOW / ASK / DENY` plus optional restrictions.
+
+## Does Security Lab attack suspicious systems?
+
+No. HoneyNet, Deception Mode, Threat Hunting, and Defense Validation are defensive/local mechanisms. Decoys are synthetic, validation targets owned/authorized systems, and the design explicitly excludes retaliation.
