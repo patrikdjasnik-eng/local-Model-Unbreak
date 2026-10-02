@@ -15,7 +15,7 @@ describe("dashboard UI", () => {
     await renderDashboard();
 
     expect(document.querySelector("h1")?.textContent).toBe("Dashboard");
-    expect(document.querySelectorAll("[data-nav]")).toHaveLength(8);
+    expect(document.querySelectorAll("[data-nav]")).toHaveLength(9);
     expect(document.querySelectorAll("[data-metric]")).toHaveLength(5);
     expect(document.querySelectorAll("[data-policy]")).toHaveLength(4);
     expect(document.querySelector(".engine-card")?.textContent).toContain("Local Engine");
@@ -27,6 +27,18 @@ describe("dashboard UI", () => {
 
     const dashboard = document.querySelector<HTMLButtonElement>('[data-nav="Dashboard"]');
     expect(dashboard?.classList.contains("active")).toBe(true);
+  });
+
+  it("opens the Local AI workspace without a placeholder modal", async () => {
+    await renderDashboard();
+
+    const localAi = document.querySelector<HTMLButtonElement>('[data-nav="Local AI"]');
+    localAi?.click();
+
+    expect(localAi?.classList.contains("active")).toBe(true);
+    expect(document.querySelector(".dashboard-grid")?.classList.contains("ai-active")).toBe(true);
+    expect(document.querySelector<HTMLElement>("[data-llm-workspace]")?.hidden).toBe(false);
+    expect(document.querySelector<HTMLDivElement>("[data-modal]")?.hidden).toBe(true);
   });
 
   it("changes active navigation and opens its workspace modal", async () => {
