@@ -8,6 +8,24 @@
 
 > Run the model you want on the hardware you actually have.
 
+## 🚀 Rychlý start – aktuální stav projektu
+
+**Důležité:** Model Unbreak je zatím ve fázi návrhu a prototypu. Aktuální repozitář není hotová desktopová aplikace ani inference runtime. Zatím tedy není k dispozici příkaz typu `npm run dev` nebo `model-unbreak run`.
+
+Pokud chceš projekt stáhnout a ověřit jeho současný TypeScript základ:
+
+```bash
+git clone https://github.com/patrikdjasnik-eng/local-Model-Unbreak.git
+cd local-Model-Unbreak
+npm install
+npm run typecheck
+npm test
+npm run build
+```
+
+Požadavky: Node.js 20 nebo novější a npm. Tyto příkazy instalují vývojové závislosti, kontrolují TypeScript, spouštějí testy a vytvářejí build. **Nespouštějí model ani inference server.** Pro skutečné spouštění GGUF modelů zatím použij samostatný runtime, například llama.cpp; jeho integrace do Model Unbreak je plánovaná, nikoli hotová.
+
+
 Model Unbreak is an experimental local-first runtime planner for GGUF inference on constrained consumer hardware. It is designed to inspect the hardware that is actually available, benchmark it, explain its limits, and choose a practical execution strategy instead of forcing the user to manually tune GPU offload, RAM spillover, remote nodes, context size, KV-cache format, and backend flags.
 
 The project does **not** pretend several devices are one magical GPU. It treats local GPU, system RAM, CPU, and explicitly trusted remote nodes as separate resources and plans inference around their real constraints.
